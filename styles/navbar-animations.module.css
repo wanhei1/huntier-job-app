@@ -1,0 +1,199 @@
+/* Navbar animations and styles */
+
+@keyframes ping-slow {
+  0% { transform: scale(0.95); opacity: 0; }
+  50% { transform: scale(1.05); opacity: 0.3; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+@keyframes morph-blob {
+  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  25% { border-radius: 40% 60% 50% 50% / 30% 60% 40% 70%; }
+  50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  75% { border-radius: 50% 50% 40% 60% / 60% 30% 70% 40%; }
+  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+}
+
+@keyframes subtle-rotate {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(0.6deg); }
+  50% { transform: rotate(0.2deg); }
+  75% { transform: rotate(-0.8deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes glow-pulse {
+  0% { opacity: 0.3; filter: blur(6px); }
+  50% { opacity: 0.7; filter: blur(9px); }
+  100% { opacity: 0.3; filter: blur(6px); }
+}
+
+@keyframes slide-in {
+  0% { transform: translateY(-10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-left {
+  0% { transform: translateX(10px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes bell-ring {
+  0%, 100% { transform: rotate(0); }
+  10% { transform: rotate(10deg); }
+  20% { transform: rotate(-8deg); }
+  30% { transform: rotate(6deg); }
+  40% { transform: rotate(-4deg); }
+  50% { transform: rotate(2deg); }
+  60% { transform: rotate(0); }
+}
+
+/* Additional animations for interactive elements */
+@keyframes glow-shine {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-ping-slow {
+  animation: ping-slow 3s ease-in-out infinite;
+}
+
+.animate-morph-blob {
+  animation: morph-blob 8s ease-in-out infinite;
+}
+
+.animate-subtle-rotate {
+  animation: subtle-rotate 8s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.5s ease-out forwards;
+}
+
+.animate-slide-left {
+  animation: slide-left 0.5s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+.animate-bell-ring {
+  animation: bell-ring 1s ease-in-out;
+}
+
+.animate-glow-shine {
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(16, 185, 129, 0.2), 
+    rgba(20, 184, 166, 0.2), 
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: glow-shine 3s linear infinite;
+}
+
+/* Navbar pill styles */
+.navbar-pill {
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(12px);
+  border-radius: 9999px;
+}
+
+.dark .navbar-pill {
+  background: rgba(23, 23, 23, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-glow {
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(90deg, 
+    rgba(16, 185, 129, 0.15), 
+    transparent 25%, 
+    rgba(20, 184, 166, 0.15) 50%,
+    transparent 75%,
+    rgba(16, 185, 129, 0.15) 100%
+  );
+  border-radius: 9999px;
+  opacity: 0.7;
+  filter: blur(6px);
+  transition: all 0.5s ease;
+}
+
+.dark .navbar-glow {
+  background: linear-gradient(90deg, 
+    rgba(16, 185, 129, 0.1), 
+    transparent 25%, 
+    rgba(20, 184, 166, 0.1) 50%,
+    transparent 75%,
+    rgba(16, 185, 129, 0.1) 100%
+  );
+  opacity: 0.5;
+}
+
+/* Hover effects for navbar links */
+.nav-link {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #10b981, #14b8a6);
+  transition: width 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  border-radius: 999px;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* Notification badge */
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: linear-gradient(135deg, #10b981, #14b8a6);
+  color: white;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s ease;
+}

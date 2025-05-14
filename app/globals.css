@@ -1,4 +1,10 @@
+/* 
+   This file uses Tailwind CSS v4 syntax
+   which includes new directives like @source, @custom-variant, @theme, and @utility
+   These may show as errors in certain editors but are valid in Tailwind v4
+*/
 @import 'tailwindcss';
+@import '../styles/navbar-animations.css';
 
 @source '../*.{js,ts,jsx,tsx,mdx}';
 
@@ -181,6 +187,35 @@
   }
 }
 
+@keyframes ping-slow {
+  0% { transform: scale(0.95); opacity: 0; }
+  50% { transform: scale(1.05); opacity: 0.3; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+@keyframes morph-blob {
+  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+}
+
+@keyframes subtle-rotate {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(1deg); }
+  75% { transform: rotate(-1deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes bell-shake {
+  0%, 100% { transform: rotate(0); }
+  10% { transform: rotate(10deg); }
+  20% { transform: rotate(-8deg); }
+  30% { transform: rotate(6deg); }
+  40% { transform: rotate(-4deg); }
+  50% { transform: rotate(2deg); }
+  60% { transform: rotate(0); }
+}
+
 .animate-float-slow {
   animation: float-slow 6s ease-in-out infinite;
 }
@@ -191,6 +226,18 @@
 
 .animate-float-fast {
   animation: float-fast 3s ease-in-out infinite;
+}
+
+.animate-ping-slow {
+  animation: ping-slow 3s ease-in-out infinite;
+}
+
+.animate-morph-blob {
+  animation: morph-blob 8s ease-in-out infinite;
+}
+
+.animate-subtle-rotate {
+  animation: subtle-rotate 5s ease-in-out infinite;
 }
 
 .animate-gradient-x {
@@ -263,6 +310,10 @@
   background-size: 200% 100%;
   background-position: right -40px top 0;
   animation: shine 2s infinite linear;
+}
+
+.animate-bell-shake {
+  animation: bell-shake 1s ease-in-out;
 }
 
 @theme {
@@ -684,7 +735,6 @@
     --accent: 0 0% 14.9%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
