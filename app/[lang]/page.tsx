@@ -20,6 +20,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { AnimatedBackground } from "@/components/animated-background";
+import { ApplicationQRCode } from "@/components/qr-code";
+import { QRImage } from "@/components/qr-image";
 
 export default async function LocaleHomePage({ params }: { params: Promise<{ lang: string }> | { lang: string } }) {
   // Await the params if it's a promise
@@ -30,7 +32,7 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ lan
   return (
     <>
       {/* Add a prominent link to the onboarding flow */}
-      <div className="fixed bottom-10 right-10 z-50">
+      <div className="fixed bottom-10 right-10 z-50 flex flex-col gap-4 items-end">
         <Link href={`/${resolvedParams.lang}/onboarding`}>
           <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all px-6 py-6 rounded-full">
             <Sparkles className="mr-2 h-5 w-5" />
@@ -38,6 +40,14 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ lan
             <ChevronRight className="ml-1 h-4 w-4" />
           </Button>
         </Link>
+        
+        {/* Fixed QR Code */}
+        <div className="relative mr-2" title={lang === 'en' ? 'Scan Application QR Code' : '扫描申请表二维码'}>
+          <ApplicationQRCode lang={lang} />
+          <span className="absolute -top-8 right-0 text-sm bg-white dark:bg-gray-800 px-2 py-1 rounded shadow whitespace-nowrap animate-bounce">
+            {lang === 'en' ? 'Scan me!' : '扫一扫!'}
+          </span>
+        </div>
       </div>
       {/* Hero Section with advanced graphics */}
       <section className="relative w-full bg-gradient-to-b from-background via-background to-emerald-50/40 dark:from-background dark:via-background dark:to-emerald-950/30 py-24 lg:py-36 overflow-hidden">
@@ -89,7 +99,7 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ lan
               </div>
               
               {/* CTA buttons with enhanced styling */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start items-center">
                 <Button size="lg" className="rounded-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 hover:from-emerald-700 hover:via-emerald-600 hover:to-teal-600 shadow-lg hover:shadow-xl transition-all px-8 py-6 text-lg group" asChild>
                   <Link href={`/${lang}/jobs`} className="flex items-center gap-2">
                     {dictionary.home.findJobsButton}
@@ -102,33 +112,56 @@ export default async function LocaleHomePage({ params }: { params: Promise<{ lan
                     <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
-              </div>
-              
-              {/* Early access community */}
-              <div className="hidden md:flex justify-start items-center gap-3 pt-8">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="w-10 h-10 rounded-full ring-2 ring-white dark:ring-gray-900 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 flex items-center justify-center text-white font-medium">
-                      {i}
-                    </div>
-                  ))}
-                  <div className="w-10 h-10 rounded-full ring-2 ring-white dark:ring-gray-900 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 flex items-center justify-center text-white text-xs">
-                    +
+                
+                {/* QR Code Button */}
+                <div className="relative ml-2" title={lang === 'en' ? 'Scan QR Code' : '扫描二维码'}>
+                  <ApplicationQRCode lang={lang} />
+                  <div className="absolute -top-1 -right-1 bg-emerald-500 text-white text-xs rounded-full px-1 animate-bounce">
+                    {lang === 'en' ? 'New' : '新'}
                   </div>
                 </div>
-                <div className="flex flex-col">
-                  <div className="flex items-center">
-                    <span className="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs px-2 py-0.5 rounded-full">
-                      {lang === 'en' ? 'Coming Soon' : '即将推出'}
+              </div>
+              
+              {/* Early access community & QR Code */}
+              <div className="hidden md:flex justify-between items-center gap-3 pt-8 w-full">
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-2">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="w-10 h-10 rounded-full ring-2 ring-white dark:ring-gray-900 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 flex items-center justify-center text-white font-medium">
+                        {i}
+                      </div>
+                    ))}
+                    <div className="w-10 h-10 rounded-full ring-2 ring-white dark:ring-gray-900 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 flex items-center justify-center text-white text-xs">
+                      +
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="flex items-center">
+                      <span className="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs px-2 py-0.5 rounded-full">
+                        {lang === 'en' ? 'Coming Soon' : '即将推出'}
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium">
+                      {lang === 'en' ? 'Join our ' : '加入我们的 '}
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                        {lang === 'en' ? 'exclusive beta' : '独家测试版'}
+                      </span>
+                      {lang === 'en' ? ' launch' : ' 发布'}
                     </span>
                   </div>
-                  <span className="text-sm font-medium">
-                    {lang === 'en' ? 'Join our ' : '加入我们的 '}
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                      {lang === 'en' ? 'exclusive beta' : '独家测试版'}
-                    </span>
-                    {lang === 'en' ? ' launch' : ' 发布'}
-                  </span>
+                </div>
+                
+                {/* Direct QR Code */}
+                <div className="flex flex-col items-center gap-2">
+                  <QRImage size="sm" lang={lang} />
+                  <div className="text-xs font-medium text-center">
+                    <p className="text-emerald-600 dark:text-emerald-400">
+                      {lang === 'en' ? 'Huntier Application' : 'Huntier 求职信息表'}
+                    </p>
+                    <p className="text-muted-foreground text-[10px] mt-1">
+                      {lang === 'en' ? 'Scan to apply' : '扫码申请'}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>                {/* Hero illustration with advanced effects */}
