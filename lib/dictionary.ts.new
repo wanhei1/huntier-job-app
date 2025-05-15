@@ -1,0 +1,212 @@
+// Simple dictionary implementation without dynamic imports
+// to avoid chunk loading issues
+
+const dictionaries: Record<string, any> = {
+  en: {
+    navbar: {
+      findJobs: "Find Jobs",
+      companies: "Companies",
+      resources: "Resources",
+      about: "About",
+      myProfile: "My Profile",
+      uploadCV: "Upload CV",
+    },
+    footer: {
+      termsOfService: "Terms of Service",
+      privacy: "Privacy",
+      cookies: "Cookies",
+      copyright: "© {year} Huntier Inc. All rights reserved.",
+    },
+    languageToggle: {
+      english: "English",
+      chinese: "中文 (Chinese)",
+    },
+    home: {
+      title: "Find Your Dream Job with",
+      titleHighlight: "AI-Powered",
+      titleEnd: "Matching",
+      subtitle:
+        "Huntier uses advanced AI to match your skills and preferences with the perfect job opportunities. Get personalized recommendations and apply with confidence.",
+      findJobsButton: "Find Jobs",
+      viewProfileButton: "View My Profile",
+      feature1: "AI-Powered Matching",
+      feature2: "10,000+ Jobs",
+      feature3: "Free to Use",
+    },
+    resources: {
+      title: "Career Resources",
+      subtitle: "Enhance your career with our curated collection of resources, guides, and tools",
+      searchPlaceholder: "Search resources...",
+      categories: {
+        all: "All Resources",
+        articles: "Articles",
+        videos: "Videos",
+        tools: "Tools",
+        guides: "Guides"
+      },
+      featured: "Featured Resource",
+      popular: "Popular Resources",
+      newContent: "New Content",
+      readMore: "Read More",
+      watchNow: "Watch Now",
+      tryNow: "Try Now",
+      saveButton: "Save",
+      savedButton: "Saved",
+      relatedResources: "Related Resources",
+      shareResource: "Share Resource",
+      filterByTopic: "Filter by Topic"
+    },
+    uploadcv: {
+      title: "Upload Your CV",
+      subtitle: "Let our AI analyze your skills and match you with the perfect job opportunities",
+      dropzone: {
+        title: "Drop your CV here",
+        subtitle: "or click to browse files",
+        formats: "Supported formats: PDF, DOCX (max 5MB)",
+        dragActive: "Drop to upload"
+      },
+      or: "OR",
+      linkedin: {
+        title: "Import from LinkedIn",
+        placeholder: "Paste your LinkedIn profile URL",
+        button: "Import Profile"
+      },
+      processing: {
+        title: "Analyzing your CV",
+        subtitle: "Our AI is extracting your skills, experience, and preferences"
+      },
+      form: {
+        name: "Full Name",
+        email: "Email Address",
+        phone: "Phone Number",
+        skills: "Skills",
+        addSkill: "Add Skill",
+        experience: "Years of Experience",
+        education: "Education",
+        languages: "Languages",
+        jobPreferences: "Job Preferences",
+        remoteOption: "Open to remote work",
+        relocationOption: "Open to relocation",
+        salaryExpectations: "Salary Expectations",
+        submit: "Find Matching Jobs",
+        privacyNotice: "By submitting, you agree to our Terms and Privacy Policy"
+      },
+      success: {
+        title: "CV Uploaded Successfully!",
+        subtitle: "We'll analyze your profile and match you with relevant opportunities",
+        cta: "View matching jobs"
+      },
+      error: {
+        generic: "Something went wrong. Please try again.",
+        fileSize: "File is too large. Maximum size is 5MB.",
+        fileType: "Invalid file type. Please upload a PDF or DOCX file.",
+        emptyFields: "Please fill in all required fields."
+      }
+    },
+  },
+  zh: {
+    navbar: {
+      findJobs: "寻找工作",
+      companies: "公司",
+      resources: "资源",
+      about: "关于我们",
+      myProfile: "我的简历",
+      uploadCV: "上传简历",
+    },
+    footer: {
+      termsOfService: "服务条款",
+      privacy: "隐私政策",
+      cookies: "Cookie 政策",
+      copyright: "© {year} Huntier Inc. 保留所有权利。",
+    },
+    languageToggle: {
+      english: "English",
+      chinese: "中文",
+    },
+    home: {
+      title: "通过",
+      titleHighlight: "AI 驱动",
+      titleEnd: "匹配找到理想工作",
+      subtitle: "Huntier 使用先进的人工智能技术，将您的技能和偏好与完美的工作机会相匹配。获取个性化推荐，自信申请。",
+      findJobsButton: "寻找工作",
+      viewProfileButton: "查看我的简历",
+      feature1: "AI 驱动匹配",
+      feature2: "10,000+ 个工作",
+      feature3: "免费使用",
+    },
+    resources: {
+      title: "职业资源",
+      subtitle: "通过我们精心策划的资源、指南和工具提升您的职业生涯",
+      searchPlaceholder: "搜索资源...",
+      categories: {
+        all: "所有资源",
+        articles: "文章",
+        videos: "视频",
+        tools: "工具",
+        guides: "指南"
+      },
+      featured: "精选资源",
+      popular: "热门资源",
+      newContent: "最新内容",
+      readMore: "阅读更多",
+      watchNow: "立即观看",
+      tryNow: "立即尝试",
+      saveButton: "保存",
+      savedButton: "已保存",
+      relatedResources: "相关资源",
+      shareResource: "分享资源",
+      filterByTopic: "按主题筛选"
+    },
+    uploadcv: {
+      title: "上传您的简历",
+      subtitle: "让我们的AI分析您的技能并匹配最适合您的工作机会",
+      dropzone: {
+        title: "将简历拖放到这里",
+        subtitle: "或点击浏览文件",
+        formats: "支持的格式：PDF、DOCX（最大5MB）",
+        dragActive: "松开鼠标上传"
+      },
+      or: "或者",
+      linkedin: {
+        title: "从领英导入",
+        placeholder: "粘贴您的领英个人资料网址",
+        button: "导入个人资料"
+      },
+      processing: {
+        title: "正在分析您的简历",
+        subtitle: "我们的AI正在提取您的技能、经验和偏好"
+      },
+      form: {
+        name: "全名",
+        email: "电子邮件地址",
+        phone: "电话号码",
+        skills: "技能",
+        addSkill: "添加技能",
+        experience: "工作经验年限",
+        education: "教育背景",
+        languages: "语言能力",
+        jobPreferences: "工作偏好",
+        remoteOption: "接受远程工作",
+        relocationOption: "接受异地工作",
+        salaryExpectations: "期望薪资",
+        submit: "查找匹配的工作",
+        privacyNotice: "提交即表示您同意我们的条款和隐私政策"
+      },
+      success: {
+        title: "简历上传成功！",
+        subtitle: "我们将分析您的个人资料并匹配相关机会",
+        cta: "查看匹配的工作"
+      },
+      error: {
+        generic: "出了点问题。请重试。",
+        fileSize: "文件太大。最大大小为5MB。",
+        fileType: "无效的文件类型。请上传PDF或DOCX文件。",
+        emptyFields: "请填写所有必填字段。"
+      }
+    },
+  },
+}
+
+export const getDictionary = async (locale: string) => {
+  return dictionaries[locale] || dictionaries.en
+}

@@ -4,7 +4,8 @@
     "companies": "公司",
     "resources": "资源",
     "about": "关于我们",
-    "myProfile": "我的简历"
+    "myProfile": "我的简历",
+    "uploadCV": "上传简历"
   },
   "footer": {
     "termsOfService": "服务条款",
@@ -48,8 +49,7 @@
     "feature1": "AI 驱动匹配",
     "feature2": "10,000+ 个工作",
     "feature3": "免费使用"
-  },
-  "resources": {
+  },  "resources": {
     "title": "职业资源",
     "subtitle": "通过我们精心策划的资源、指南和工具提升您的职业生涯",
     "searchPlaceholder": "搜索资源...",
@@ -77,6 +77,53 @@
     "noResults": "未找到匹配的资源",
     "adjustSearch": "请调整您的搜索或筛选条件",
     "clearFilters": "清除所有筛选"
+  },
+  "uploadcv": {
+    "title": "上传您的简历",
+    "subtitle": "让我们的AI分析您的技能并匹配最适合您的工作机会",
+    "dropzone": {
+      "title": "将简历拖放到这里",
+      "subtitle": "或点击浏览文件",
+      "formats": "支持的格式：PDF、DOCX（最大5MB）",
+      "dragActive": "松开鼠标上传"
+    },
+    "or": "或者",
+    "linkedin": {
+      "title": "从领英导入",
+      "placeholder": "粘贴您的领英个人资料网址",
+      "button": "导入个人资料"
+    },
+    "processing": {
+      "title": "正在分析您的简历",
+      "subtitle": "我们的AI正在提取您的技能、经验和偏好"
+    },
+    "form": {
+      "name": "全名",
+      "email": "电子邮件地址",
+      "phone": "电话号码",
+      "skills": "技能",
+      "addSkill": "添加技能",
+      "experience": "工作经验年限",
+      "education": "教育背景",
+      "languages": "语言能力",
+      "jobPreferences": "工作偏好",
+      "remoteOption": "接受远程工作",
+      "relocationOption": "接受异地工作",
+      "salaryExpectations": "期望薪资",
+      "submit": "查找匹配的工作",
+      "privacyNotice": "提交即表示您同意我们的条款和隐私政策"
+    },
+    "success": {
+      "title": "简历上传成功！",
+      "subtitle": "我们将分析您的个人资料并匹配相关机会",
+      "cta": "查看匹配的工作"
+    },
+    "error": {
+      "generic": "出了点问题。请重试。",
+      "fileSize": "文件太大。最大大小为5MB。",
+      "fileType": "无效的文件类型。请上传PDF或DOCX文件。",
+      "emptyFields": "请填写所有必填字段。"
+    }
   },
   "about": {
     "established": "成立于2020年",

@@ -5,7 +5,7 @@ export default async function ResourcesPage({ params }: { params: Promise<{ lang
   // Await the params if it's a promise
   const resolvedParams = await Promise.resolve(params);
   const lang = resolvedParams.lang;
-  const dictionary = getDictionary(lang);
+  const dictionary = await getDictionary(lang);
   
   return <ResourcesClient dictionary={dictionary} lang={lang} />;
 }

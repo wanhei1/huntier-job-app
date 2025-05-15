@@ -4,7 +4,8 @@
     "companies": "Companies",
     "resources": "Resources",
     "about": "About",
-    "myProfile": "My Profile"
+    "myProfile": "My Profile",
+    "uploadCV": "Upload CV"
   },
   "footer": {
     "termsOfService": "Terms of Service",
@@ -48,8 +49,7 @@
     "feature1": "AI-Powered Matching",
     "feature2": "10,000+ Jobs",
     "feature3": "Free to Use"
-  },
-  "resources": {
+  },  "resources": {
     "title": "Career Resources",
     "subtitle": "Enhance your career with our curated collection of resources, guides, and tools",
     "searchPlaceholder": "Search resources...",
@@ -78,7 +78,53 @@
     "adjustSearch": "Try adjusting your search or filters",
     "clearFilters": "Clear all filters"
   },
-  "about": {
+  "uploadcv": {
+    "title": "Upload Your CV",
+    "subtitle": "Let our AI analyze your skills and match you with the perfect job opportunities",
+    "dropzone": {
+      "title": "Drop your CV here",
+      "subtitle": "or click to browse files",
+      "formats": "Supported formats: PDF, DOCX (max 5MB)",
+      "dragActive": "Drop to upload"
+    },
+    "or": "OR",
+    "linkedin": {
+      "title": "Import from LinkedIn",
+      "placeholder": "Paste your LinkedIn profile URL",
+      "button": "Import Profile"
+    },
+    "processing": {
+      "title": "Analyzing your CV",
+      "subtitle": "Our AI is extracting your skills, experience, and preferences"
+    },
+    "form": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "skills": "Skills",
+      "addSkill": "Add Skill",
+      "experience": "Years of Experience",
+      "education": "Education",
+      "languages": "Languages",
+      "jobPreferences": "Job Preferences",
+      "remoteOption": "Open to remote work",
+      "relocationOption": "Open to relocation",
+      "salaryExpectations": "Salary Expectations",
+      "submit": "Find Matching Jobs",
+      "privacyNotice": "By submitting, you agree to our Terms and Privacy Policy"
+    },
+    "success": {
+      "title": "CV Uploaded Successfully!",
+      "subtitle": "We'll analyze your profile and match you with relevant opportunities",
+      "cta": "View matching jobs"
+    },
+    "error": {
+      "generic": "Something went wrong. Please try again.",
+      "fileSize": "File is too large. Maximum size is 5MB.",
+      "fileType": "Invalid file type. Please upload a PDF or DOCX file.",
+      "emptyFields": "Please fill in all required fields."
+    }
+  },"about": {
     "established": "Established 2020",
     "ourMission": "Our Mission",
     "missionStatement": "To connect talent with opportunity through AI-driven semantic matching that considers not just skills, but values, goals, and potential using next-generation vectorized technology.",

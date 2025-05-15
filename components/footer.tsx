@@ -6,8 +6,8 @@ interface FooterProps {
   lang: string
 }
 
-export function Footer({ lang }: FooterProps) {
-  const dictionary = getDictionary(lang)
+export async function Footer({ lang }: FooterProps) {
+  const dictionary = await getDictionary(lang)
 
   return (
     <footer className="border-t bg-background relative">

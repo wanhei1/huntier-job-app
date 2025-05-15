@@ -1,6 +1,7 @@
 "use client"
 
-import Image from 'next/image'
+import { Button } from '@/components/ui/button'
+import { ExternalLink } from 'lucide-react'
 
 interface QRImageProps {
   size?: "sm" | "md" | "lg"
@@ -9,22 +10,21 @@ interface QRImageProps {
 
 export function QRImage({ size = "md", lang }: QRImageProps) {
   const sizes = {
-    sm: { width: 100, height: 100, className: "rounded-lg" },
-    md: { width: 150, height: 150, className: "rounded-xl" },
-    lg: { width: 200, height: 200, className: "rounded-2xl" }
+    sm: { className: "text-xs px-2 py-1" },
+    md: { className: "text-sm px-3 py-2" },
+    lg: { className: "text-base px-4 py-3" }
   }
 
-  const { width, height, className } = sizes[size]
-
+  const { className } = sizes[size]
   return (
-    <div className={`overflow-hidden border-2 border-emerald-200 dark:border-emerald-800 shadow-lg ${className} bg-white`}>
-      <Image 
-        src="/qr-code.png" 
-        alt={lang === 'en' ? "Huntier Job Application Form QR Code" : "Huntier 求职信息表二维码"} 
-        width={width} 
-        height={height}
-        className="w-full h-auto"
-      />
-    </div>
+    <a 
+      href="https://forms.office.com/Pages/ResponsePage.aspx?id=ROSIKAh8xEeDWfJL0sT0JiIbgHXDTOxPl-deIlSNGStUMzZaQ1NVUFBEQUJJNjJXQzFXTVY0S1JFWi4u&origin=QRCode"
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`flex items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-medium transition-all ${className} shadow-md hover:shadow-lg`}
+    >
+      {lang === 'en' ? "Application Form" : "申请表"}
+      <ExternalLink className="h-3.5 w-3.5" />
+    </a>
   )
 }

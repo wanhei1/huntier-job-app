@@ -1,48 +1,23 @@
 import Link from "next/link"
-import { BriefcaseBusiness, User } from "lucide-react"
+import { BriefcaseBusiness } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LanguageToggle } from "@/components/language-toggle"
 import { NavClient } from "@/components/nav-client"
-import { NotificationBell } from "@/components/notification-bell"
 import { getDictionary } from "@/lib/dictionary"
 import styles from '@/styles/navbar-animations.module.css'
+import { ApplicationQRCode } from "@/components/qr-code"
 
 interface NavbarProps {
   lang: string
 }
 
-export function Navbar({ lang }: NavbarProps) {
-  const dictionary = getDictionary(lang)
-
-  // Sample notifications for demo purposes
-  const sampleNotifications = [
-    {
-      id: "1",
-      title: "New Job Match",
-      message: "We've found 3 new jobs that match your skills and preferences!",
-      time: "Just now",
-      read: false,
-    },
-    {
-      id: "2",
-      title: "Application Update",
-      message: "Your application for Senior Frontend Developer at TechCorp has moved to the next stage.",
-      time: "2 hours ago",
-      read: false,
-    },
-    {
-      id: "3",
-      title: "Profile View",
-      message: "A recruiter from DesignTech viewed your profile.",
-      time: "Yesterday",
-      read: true,
-    },
-  ]
-
+export async function Navbar({ lang }: NavbarProps) {
+  const dictionary = await getDictionary(lang)
   const navItems = [
     { name: dictionary.navbar.resources, href: `/${lang}/resources` },
     { name: dictionary.navbar.about, href: `/${lang}/about` },
+    { name: dictionary.navbar.uploadCV, href: `/${lang}/uploadcv` },
   ]
 
   return (
@@ -80,8 +55,7 @@ export function Navbar({ lang }: NavbarProps) {
               </span>
             </Link>
             <NavClient lang={lang} navItems={navItems} myProfileText={dictionary.navbar.myProfile} />
-          </div>
-          <div className="flex items-center gap-3">
+          </div>          <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 transition-all hover:scale-105">
               <ThemeToggle />
             </div>
@@ -95,20 +69,9 @@ export function Navbar({ lang }: NavbarProps) {
               />
             </div>
             <div className="relative transition-all hover:scale-105">
-              <NotificationBell notifications={sampleNotifications} />
+              <ApplicationQRCode lang={lang} />
               <div className="absolute top-0 right-0 w-full h-full bg-transparent rounded-full animate-ping-slow opacity-0 hover:opacity-30 transition-opacity duration-300"></div>
             </div>
-            <Button 
-              asChild 
-              variant="ghost" 
-              size="icon" 
-              className="rounded-full h-9 w-9 hidden md:flex hover:bg-emerald-50/50 dark:hover:bg-emerald-900/30 transition-all duration-300 hover:scale-110 hover:shadow-md hover:shadow-emerald-500/10"
-            >
-              <Link href={`/${lang}/profile`}>
-                <User className="h-[1.2rem] w-[1.2rem] text-emerald-600 dark:text-emerald-400" />
-                <span className="sr-only">Profile</span>
-              </Link>
-            </Button>
           </div>
         </div>
       </div>
