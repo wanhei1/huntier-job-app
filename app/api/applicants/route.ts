@@ -88,22 +88,40 @@ export async function POST(request: Request) {
         details: formData.workHistory
       };
     }
-      
-    // Prepare the values for insertion
+        // Prepare the values for insertion
     const values = {
+      // Basic information
       name: formData.name || '',
+      firstName: formData.firstName || null,
+      lastName: formData.lastName || null,
+      chineseName: formData.chineseName || null,
       email: formData.email || '',
       phone: formData.phone || null,
+      
+      // Skills and languages
       skills: skills.filter(Boolean), // Filter out any empty or null items
+      languages: languages.filter(Boolean), // Filter out any empty or null items
+      certifications: Array.isArray(formData.certifications) ? formData.certifications.filter(Boolean) : [],
+      
+      // Experience and education
       experience: experienceData,
       education: educationData,
-      languages: languages.filter(Boolean), // Filter out any empty or null items
+      
+      // Projects
+      projects: Array.isArray(formData.projects) ? formData.projects : null,
+      
+      // Job preferences
+      location: formData.location || null,
       jobPreferences: jobPreferences,
       remoteOption: formData.remoteOption === true || formData.remoteOption === "true",
       relocationOption: formData.relocationOption === true || formData.relocationOption === "true",
       salaryExpectations: formData.salaryExpectations ? formData.salaryExpectations.toString() : null,
+      
+      // URLs and links
       resumeUrl: formData.resumeUrl || null,
       linkedinUrl: formData.linkedinUrl || null,
+      githubUrl: formData.githubUrl || null,
+      portfolioUrl: formData.portfolioUrl || null,
     };
     
     console.log("About to insert into database:", values);

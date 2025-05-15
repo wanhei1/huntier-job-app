@@ -1,11 +1,14 @@
 // This file contains helper functions to check the database connection
 import { db } from '@/lib/db';
 import { applicants } from '@/db/schema';
+import { sql } from 'drizzle-orm';
 
 export async function checkDatabaseConnection() {
   try {
-    // Try to execute a simple query
-    const result = await db.select({ count: db.fn.count() }).from(applicants);
+    // Try to execute a simple query using SQL count function
+    const result = await db.select({
+      count: sql<number>`count(*)`
+    }).from(applicants);
     
     console.log('Database connection check: Success');
     console.log('Current applicant count:', result[0]?.count);

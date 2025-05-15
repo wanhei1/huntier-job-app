@@ -350,15 +350,23 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
     
     setIsProcessing(true);
     setError(null);
-      try {
-      // Prepare applicant data with detailed structure matching the database schema
+      try {      // Prepare applicant data with detailed structure matching the database schema
       const applicantData = {
+        // Basic information
         name: `${data.firstName} ${data.lastName}`.trim(),
+        firstName: data.firstName.trim(),
+        lastName: data.lastName.trim(),
+        chineseName: data.chineseName || null,
         email: data.email.trim(),
         phone: data.phone || null,
+        
+        // Skills and languages
         skills: Array.isArray(data.skills) ? data.skills.filter(Boolean) : [], 
+        languages: Array.isArray(data.languages) ? data.languages.filter(Boolean) : [],
+        certifications: Array.isArray(data.certifications) ? data.certifications.filter(Boolean) : [],
+        
+        // Experience and education
         experience: data.experience || null,
-        // Include work history if available
         workHistory: Array.isArray(data.workHistory) && data.workHistory.length > 0 
           ? data.workHistory.map(job => ({
               company: job.company,
@@ -368,8 +376,7 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
               description: job.description || null,
               isCurrent: !!job.isCurrent
             }))
-          : undefined,
-        // Include education level and details
+          : [],
         educationLevel: data.educationLevel || null,
         education: Array.isArray(data.education) && data.education.length > 0
           ? data.education.map(edu => ({
@@ -378,21 +385,25 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
               field: edu.field || null, 
               graduationYear: edu.graduationYear
             }))
-          : undefined,
-        languages: Array.isArray(data.languages) ? data.languages.filter(Boolean) : [],
-        // Include additional profile links
-        githubUrl: data.githubUrl || null,
-        portfolioUrl: data.portfolioUrl || null,
+          : [],
+          
+        // Projects
+        projects: Array.isArray(data.projects) ? data.projects.filter(proj => proj.name) : [],
+        
+        // Job preferences
+        location: data.location || null,
         jobPreferences: {
           additionalInfo: data.additionalInfo || "",
           location: data.location || "",
-          portfolioUrl: data.portfolioUrl || "",
-          githubUrl: data.githubUrl || ""
         },
         remoteOption: !!data.remoteWork, // ensure boolean
         relocationOption: !!data.relocation, // ensure boolean
         salaryExpectations: data.salaryExpectations ? data.salaryExpectations.toString() : null,
-        linkedinUrl: data.linkedinUrl || null
+        
+        // URLs and links
+        linkedinUrl: data.linkedinUrl || null,
+        githubUrl: data.githubUrl || null,
+        portfolioUrl: data.portfolioUrl || null
       };console.log("Sending data to API:", JSON.stringify(applicantData, null, 2));
       
       try {
