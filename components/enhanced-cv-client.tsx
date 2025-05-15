@@ -165,6 +165,11 @@ const educationLevelOptions = [
   "PhD", "Vocational Training", "Professional Certification", "Other"
 ];
 
+const zhEducationLevelOptions = [
+  "高中", "专科学位", "学士学位", "硕士学位", 
+  "博士学位", "职业培训", "专业认证", "其他"
+];
+
 const locationOptions = [
   "Beijing", "Shanghai", "Guangzhou", "Shenzhen", "Hangzhou", 
   "Chengdu", "Xi'an", "Nanjing", "Wuhan", "Tianjin", "Other"
@@ -567,11 +572,10 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                   <Card className="border-border/40 bg-card/50 backdrop-blur-sm p-6">
                     <div className="space-y-6">
-                      {/* Basic Information */}
-                      <div>
+                      {/* Basic Information */}                      <div>
                         <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                           <FileText className="h-5 w-5 text-emerald-500" />
-                          Basic Information
+                          {lang === 'zh' ? '基本信息' : 'Basic Information'}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <FormField
@@ -579,7 +583,7 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                             name="firstName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>First Name *</FormLabel>
+                                <FormLabel>{lang === 'zh' ? '名字 *' : 'First Name *'}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="John" {...field} />
                                 </FormControl>
@@ -593,7 +597,7 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                             name="lastName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Last Name *</FormLabel>
+                                <FormLabel>{lang === 'zh' ? '姓氏 *' : 'Last Name *'}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Doe" {...field} />
                                 </FormControl>
@@ -601,13 +605,12 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                               </FormItem>
                             )}
                           />
-                          
-                          <FormField
+                            <FormField
                             control={form.control}
                             name="chineseName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Chinese Name (Optional)</FormLabel>
+                                <FormLabel>{lang === 'zh' ? '中文姓名（可选）' : 'Chinese Name (Optional)'}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="李明" {...field} />
                                 </FormControl>
@@ -643,20 +646,19 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                               </FormItem>
                             )}
                           />
-                          
-                          <FormField
+                            <FormField
                             control={form.control}
                             name="location"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Location</FormLabel>
+                                <FormLabel>{lang === 'zh' ? '所在地区' : 'Location'}</FormLabel>
                                 <Select 
                                   onValueChange={field.onChange} 
                                   defaultValue={field.value}
                                 >
                                   <FormControl>
                                     <SelectTrigger>
-                                      <SelectValue placeholder="Select your location" />
+                                      <SelectValue placeholder={lang === 'zh' ? "选择您的所在地" : "Select your location"} />
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
@@ -737,8 +739,7 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                         </h3>
                         <div className="space-y-4">
                           <div className="flex gap-2">
-                            <Input
-                              placeholder="Add a skill..."
+                            <Input                              placeholder={lang === 'zh' ? '添加技能...' : 'Add a skill...'}
                               value={skillInput}
                               onChange={(e) => setSkillInput(e.target.value)}
                               className="flex-1"
@@ -780,7 +781,7 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                             ))}
                             {skills.length === 0 && (
                               <p className="text-sm text-muted-foreground">
-                                No skills added yet. Please add at least one skill.
+                                {lang === 'zh' ? '尚未添加技能。请至少添加一项技能。' : 'No skills added yet. Please add at least one skill.'}
                               </p>
                             )}
                           </div>
@@ -796,9 +797,8 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                           {d.form.languages} *
                         </h3>
                         <div className="space-y-4">
-                          <div className="flex gap-2">
-                            <Input
-                              placeholder="Add a language..."
+                          <div className="flex gap-2">                            <Input
+                              placeholder={lang === 'zh' ? '添加语言...' : 'Add a language...'}
                               value={languageInput}
                               onChange={(e) => setLanguageInput(e.target.value)}
                               className="flex-1"
@@ -808,15 +808,14 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                   addLanguage();
                                 }
                               }}
-                            />
-                            <Button 
+                            />                            <Button 
                               type="button" 
                               variant="outline"
                               onClick={addLanguage}
                               className="border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800 hover:border-blue-300 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/30"
                             >
                               <Plus className="h-4 w-4 mr-2" />
-                              Add Language
+                              {lang === 'zh' ? '添加语言' : 'Add Language'}
                             </Button>
                           </div>
                           
@@ -837,10 +836,9 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                   <X className="h-3 w-3" />
                                 </span>
                               </Badge>
-                            ))}
-                            {languages.length === 0 && (
+                            ))}                            {languages.length === 0 && (
                               <p className="text-sm text-muted-foreground">
-                                No languages added yet. Please add at least one language.
+                                {lang === 'zh' ? '尚未添加语言。请至少添加一种语言。' : 'No languages added yet. Please add at least one language.'}
                               </p>
                             )}
                           </div>
@@ -849,11 +847,10 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                       
                       <Separator />
                       
-                      {/* Experience */}
-                      <div>
+                      {/* Experience */}                      <div>
                         <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                           <Briefcase className="h-5 w-5 text-indigo-500" />
-                          Work Experience
+                          {lang === 'zh' ? '工作经验' : 'Work Experience'}
                         </h3>
                         
                         <FormField
@@ -861,20 +858,19 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                           name="experience"
                           render={({ field }) => (
                             <FormItem className="mb-6">
-                              <FormLabel>{d.form.experience} *</FormLabel>
-                              <Select 
+                              <FormLabel>{d.form.experience} *</FormLabel>                              <Select 
                                 onValueChange={field.onChange} 
                                 defaultValue={field.value}
                               >
                                 <FormControl>
                                   <SelectTrigger>
-                                    <SelectValue placeholder="Select years of experience" />
+                                    <SelectValue placeholder={lang === 'zh' ? '选择工作经验年限' : 'Select years of experience'} />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
                                   {experienceOptions.map((option) => (
                                     <SelectItem key={option} value={option}>
-                                      {option} years
+                                      {option} {lang === 'zh' ? '年' : 'years'}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -920,10 +916,9 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                       control={form.control}
                                       name={`workHistory.${index}.company`}
                                       render={({ field }) => (
-                                        <FormItem>
-                                          <FormLabel>Company</FormLabel>
+                                        <FormItem>                                          <FormLabel>{lang === 'zh' ? '公司名称' : 'Company'}</FormLabel>
                                           <FormControl>
-                                            <Input {...field} placeholder="Company name" />
+                                            <Input {...field} placeholder={lang === 'zh' ? '公司名称' : 'Company name'} />
                                           </FormControl>
                                           <FormMessage />
                                         </FormItem>
@@ -934,10 +929,9 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                       control={form.control}
                                       name={`workHistory.${index}.position`}
                                       render={({ field }) => (
-                                        <FormItem>
-                                          <FormLabel>Position</FormLabel>
+                                        <FormItem>                                          <FormLabel>{lang === 'zh' ? '职位' : 'Position'}</FormLabel>
                                           <FormControl>
-                                            <Input {...field} placeholder="Job title" />
+                                            <Input {...field} placeholder={lang === 'zh' ? '职位名称' : 'Job title'} />
                                           </FormControl>
                                           <FormMessage />
                                         </FormItem>
@@ -948,8 +942,7 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                       control={form.control}
                                       name={`workHistory.${index}.startDate`}
                                       render={({ field }) => (
-                                        <FormItem>
-                                          <FormLabel>Start Date</FormLabel>
+                                        <FormItem>                                          <FormLabel>{lang === 'zh' ? '开始日期' : 'Start Date'}</FormLabel>
                                           <FormControl>
                                             <Input {...field} placeholder="MM/YYYY" />
                                           </FormControl>
@@ -963,10 +956,9 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                       name={`workHistory.${index}.isCurrent`}
                                       render={({ field }) => (
                                         <FormItem className="flex flex-row items-center justify-between space-x-2 rounded-md border p-3">
-                                          <div className="space-y-0.5">
-                                            <FormLabel>Current Position</FormLabel>
+                                          <div className="space-y-0.5">                                            <FormLabel>{lang === 'zh' ? '当前工作' : 'Current Position'}</FormLabel>
                                             <FormDescription className="text-xs">
-                                              Is this your current job?
+                                              {lang === 'zh' ? '这是您当前的工作吗？' : 'Is this your current job?'}
                                             </FormDescription>
                                           </div>
                                           <FormControl>
@@ -983,9 +975,8 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                       <FormField
                                         control={form.control}
                                         name={`workHistory.${index}.endDate`}
-                                        render={({ field }) => (
-                                          <FormItem className="md:col-span-2">
-                                            <FormLabel>End Date</FormLabel>
+                                        render={({ field }) => (                                          <FormItem className="md:col-span-2">
+                                            <FormLabel>{lang === 'zh' ? '结束日期' : 'End Date'}</FormLabel>
                                             <FormControl>
                                               <Input {...field} placeholder="MM/YYYY" />
                                             </FormControl>
@@ -999,12 +990,11 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                       control={form.control}
                                       name={`workHistory.${index}.description`}
                                       render={({ field }) => (
-                                        <FormItem className="md:col-span-2">
-                                          <FormLabel>Description</FormLabel>
+                                        <FormItem className="md:col-span-2">                                          <FormLabel>{lang === 'zh' ? '工作描述' : 'Description'}</FormLabel>
                                           <FormControl>
                                             <Textarea 
                                               {...field} 
-                                              placeholder="Describe your responsibilities, achievements, and skills used"
+                                              placeholder={lang === 'zh' ? '描述您的职责、成就和使用的技能' : 'Describe your responsibilities, achievements, and skills used'}
                                               className="min-h-[100px] resize-none"
                                             />
                                           </FormControl>
@@ -1031,9 +1021,8 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                               description: "",
                               isCurrent: false
                             })}
-                          >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Work Experience
+                          >                            <Plus className="mr-2 h-4 w-4" />
+                            {lang === 'zh' ? '添加工作经历' : 'Add Work Experience'}
                           </Button>
                         </div>
                       </div>
@@ -1051,20 +1040,18 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                           control={form.control}
                           name="educationLevel"
                           render={({ field }) => (
-                            <FormItem className="mb-6">
-                              <FormLabel>Highest Education Level *</FormLabel>
-                              <Select 
+                            <FormItem className="mb-6">                              <FormLabel>{lang === 'zh' ? '最高学历 *' : 'Highest Education Level *'}</FormLabel>                              <Select 
                                 onValueChange={field.onChange} 
                                 defaultValue={field.value}
                               >
                                 <FormControl>
                                   <SelectTrigger>
-                                    <SelectValue placeholder="Select your highest education level" />
+                                    <SelectValue placeholder={lang === 'zh' ? '选择您的最高学历' : 'Select your highest education level'} />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {educationLevelOptions.map((option) => (
-                                    <SelectItem key={option} value={option}>
+                                  {(lang === 'zh' ? zhEducationLevelOptions : educationLevelOptions).map((option, index) => (
+                                    <SelectItem key={educationLevelOptions[index]} value={educationLevelOptions[index]}>
                                       {option}
                                     </SelectItem>
                                   ))}
@@ -1111,10 +1098,9 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                       control={form.control}
                                       name={`education.${index}.degree`}
                                       render={({ field }) => (
-                                        <FormItem>
-                                          <FormLabel>Degree</FormLabel>
+                                        <FormItem>                                          <FormLabel>{lang === 'zh' ? '学位/学历' : 'Degree'}</FormLabel>
                                           <FormControl>
-                                            <Input {...field} placeholder="Bachelor of Science" />
+                                            <Input {...field} placeholder={lang === 'zh' ? '理学学士' : 'Bachelor of Science'} />
                                           </FormControl>
                                           <FormMessage />
                                         </FormItem>
@@ -1125,10 +1111,9 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                       control={form.control}
                                       name={`education.${index}.institution`}
                                       render={({ field }) => (
-                                        <FormItem>
-                                          <FormLabel>Institution</FormLabel>
+                                        <FormItem>                                          <FormLabel>{lang === 'zh' ? '学校/机构' : 'Institution'}</FormLabel>
                                           <FormControl>
-                                            <Input {...field} placeholder="University name" />
+                                            <Input {...field} placeholder={lang === 'zh' ? '大学名称' : 'University name'} />
                                           </FormControl>
                                           <FormMessage />
                                         </FormItem>
@@ -1139,10 +1124,9 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                       control={form.control}
                                       name={`education.${index}.field`}
                                       render={({ field }) => (
-                                        <FormItem>
-                                          <FormLabel>Field of Study</FormLabel>
+                                        <FormItem>                                          <FormLabel>{lang === 'zh' ? '专业/领域' : 'Field of Study'}</FormLabel>
                                           <FormControl>
-                                            <Input {...field} placeholder="e.g., Computer Science" />
+                                            <Input {...field} placeholder={lang === 'zh' ? '例如，计算机科学' : 'e.g., Computer Science'} />
                                           </FormControl>
                                           <FormMessage />
                                         </FormItem>
@@ -1153,8 +1137,7 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                       control={form.control}
                                       name={`education.${index}.graduationYear`}
                                       render={({ field }) => (
-                                        <FormItem>
-                                          <FormLabel>Graduation Year</FormLabel>
+                                        <FormItem>                                          <FormLabel>{lang === 'zh' ? '毕业年份' : 'Graduation Year'}</FormLabel>
                                           <FormControl>
                                             <Input {...field} placeholder="YYYY" />
                                           </FormControl>
@@ -1179,9 +1162,8 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                               field: "",
                               graduationYear: ""
                             })}
-                          >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Education
+                          >                            <Plus className="mr-2 h-4 w-4" />
+                            {lang === 'zh' ? '添加教育经历' : 'Add Education'}
                           </Button>
                         </div>
                       </div>
@@ -1189,15 +1171,13 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                       <Separator />
                       
                       {/* Certifications */}
-                      <div>
-                        <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
+                      <div>                        <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                           <Award className="h-5 w-5 text-amber-500" />
-                          Certifications & Licenses
+                          {lang === 'zh' ? '证书与认证' : 'Certifications & Licenses'}
                         </h3>
                         <div className="space-y-4">
-                          <div className="flex gap-2">
-                            <Input
-                              placeholder="Add a certification..."
+                          <div className="flex gap-2">                            <Input
+                              placeholder={lang === 'zh' ? '添加证书...' : 'Add a certification...'}
                               value={certificationInput}
                               onChange={(e) => setCertificationInput(e.target.value)}
                               className="flex-1"
@@ -1207,15 +1187,14 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                   addCertification();
                                 }
                               }}
-                            />
-                            <Button 
+                            />                            <Button 
                               type="button" 
                               variant="outline"
                               onClick={addCertification}
                               className="border-amber-200 text-amber-700 hover:bg-amber-50 hover:text-amber-800 hover:border-amber-300 dark:border-amber-800 dark:text-amber-400 dark:hover:bg-amber-900/30"
                             >
                               <Plus className="h-4 w-4 mr-2" />
-                              Add Certification
+                              {lang === 'zh' ? '添加证书' : 'Add Certification'}
                             </Button>
                           </div>
                           
@@ -1236,10 +1215,9 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                   <X className="h-3 w-3" />
                                 </span>
                               </Badge>
-                            ))}
-                            {certifications.length === 0 && (
+                            ))}                            {certifications.length === 0 && (
                               <p className="text-sm text-muted-foreground">
-                                No certifications added yet.
+                                {lang === 'zh' ? '尚未添加证书。' : 'No certifications added yet.'}
                               </p>
                             )}
                           </div>
@@ -1333,19 +1311,17 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                       
                       <Separator />
                       
-                      {/* Additional Information */}
-                      <div>
-                        <h3 className="text-lg font-medium mb-4">Additional Information</h3>
+                      {/* Additional Information */}                      <div>
+                        <h3 className="text-lg font-medium mb-4">{lang === 'zh' ? '补充信息' : 'Additional Information'}</h3>
                         <FormField
                           control={form.control}
                           name="additionalInfo"
                           render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
+                            <FormItem>                              <FormControl>
                                 <Textarea 
-                                  placeholder="Add any other information you'd like employers to know about you..."
-                                  {...field}
+                                  placeholder={lang === 'zh' ? '分享更多关于您的职业目标、偏好或其他您希望雇主了解的信息' : "Add any other information you'd like employers to know about you..."}
                                   className="min-h-[120px] resize-none"
+                                  {...field}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -1356,11 +1332,10 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                       
                       <Separator />
                       
-                      {/* CV Upload (Optional) */}
-                      <div>
+                      {/* CV Upload (Optional) */}                      <div>
                         <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                           <Upload className="h-5 w-5 text-indigo-500" />
-                          Upload CV (Optional)
+                          {lang === 'zh' ? '上传简历（可选）' : 'Upload CV (Optional)'}
                         </h3>
                         <input
                           ref={fileInputRef}
@@ -1385,13 +1360,12 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                       className="w-full md:w-auto bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600"
                       disabled={isProcessing}
                       size="lg"
-                    >
-                      {isProcessing ? (
+                    >                      {isProcessing ? (
                         <>
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          Processing...
+                          {lang === 'zh' ? '处理中...' : 'Processing...'}
                         </>
-                      ) : (
+                      ): (
                         <>
                           <Sparkles className="mr-2 h-5 w-5" />
                           {d.form.submit}

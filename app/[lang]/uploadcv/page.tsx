@@ -16,6 +16,12 @@ export default async function UploadCVPage({
   const resolvedParams = await params;
   const lang = resolvedParams.lang;
   const dictionary = await getDictionary(lang);
+
+  // Update metadata based on language
+  if (lang === 'zh') {
+    metadata.title = "上传简历 | Huntier";
+    metadata.description = "上传您的简历，让我们的AI为您匹配完美的工作机会。";
+  }
   
   return <EnhancedCVClient dictionary={dictionary} lang={lang} />;
 }
