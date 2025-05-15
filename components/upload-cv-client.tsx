@@ -214,21 +214,30 @@ export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
   };
   
   type FormValues = z.infer<typeof formSchema>;
-  
-  const form = useForm<FormValues>({
+    const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
+      chineseName: "",
       email: "",
       phone: "",
+      location: "",
       skills: [],
-      experience: "0-1",
-      education: "",
       languages: ["English"],
+      experience: "0-1",
+      workHistory: [],
+      educationLevel: "Bachelor's Degree",
+      education: [],
+      certifications: [],
+      projects: [],
       remoteWork: true,
       relocation: false,
-      salaryExpectations: "",
+      salaryExpectations: 0,
       additionalInfo: "",
+      linkedinUrl: "",
+      githubUrl: "",
+      portfolioUrl: ""
     },
   });
 
@@ -245,17 +254,79 @@ export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
     const newSkills = skills.filter(skill => skill !== skillToRemove);
     setSkills(newSkills);
     form.setValue("skills", newSkills);
-  };
-
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
+  };  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    console.log("Form submission started");
     setIsProcessing(true);
+    setError(null);
     
-    // Simulate submitting the form
-    setTimeout(() => {
+    try {
+      // Prepare applicant data
+      const applicantData = {
+        name: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        phone: data.phone,
+        skills: data.skills,
+        experience: data.experience,
+        education: data.educationLevel,
+        languages: data.languages,
+        jobPreferences: {
+          additionalInfo: data.additionalInfo || "",
+          location: data.location || "",
+          portfolioUrl: data.portfolioUrl || "",
+          githubUrl: data.githubUrl || ""
+        },
+        remoteOption: data.remoteWork,
+        relocationOption: data.relocation,
+        salaryExpectations: data.salaryExpectations?.toString() || "0",
+        linkedinUrl: data.linkedinUrl || ""
+      };
+      
+      console.log("Sending data to API:", JSON.stringify(applicantData, null, 2));
+      
+      // Fetch API endpoint
+      try {
+        const response = await fetch('/api/applicants', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(applicantData),
+        });
+        
+        console.log("API Response status:", response.status);
+        
+        // Parse response
+        try {
+          const result = await response.json();
+          console.log("API Response data:", result);
+          
+          if (result.success) {            setIsProcessing(false);
+            setIsSuccess(true);
+            console.log("Application submitted successfully:", result.data);
+            
+            // Log to confirm data was saved to database
+            console.log("Database record ID:", result.data?.id);
+            console.log("Database record created:", result.data?.created_at);
+          } else {
+            setIsProcessing(false);
+            setError(result.error || d.error.generic);
+            console.error('Error from API:', result.error);
+          }
+        } catch (parseError) {
+          console.error("Error parsing API response:", parseError);
+          setIsProcessing(false);
+          setError("Error parsing server response");
+        }
+      } catch (fetchError) {
+        console.error("Fetch error:", fetchError);
+        setIsProcessing(false);
+        setError("Network error, please try again");
+      }
+    } catch (error) {
+      console.error('Unexpected error during form submission:', error);
       setIsProcessing(false);
-      setIsSuccess(true);
-      console.log(data);
-    }, 2000);
+      setError(d.error.generic);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -335,15 +406,28 @@ export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
                       {/* Basic Information */}
                       <div>
                         <h3 className="text-lg font-medium mb-4">Basic Information</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <FormField
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">                          <FormField
                             control={form.control}
-                            name="name"
+                            name="firstName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>{d.form.name} *</FormLabel>
+                                <FormLabel>First Name *</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="John Doe" {...field} />
+                                  <Input placeholder="John" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="lastName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Last Name *</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Doe" {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -437,21 +521,21 @@ export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
                             </Button>
                           </div>
                           
-                          <div className="flex flex-wrap gap-2">
-                            {skills.map((skill) => (
-                              <Badge 
+                          <div className="flex flex-wrap gap-2">                            {skills.map((skill) => (                              <Badge 
                                 key={skill} 
                                 variant="secondary"
                                 className="py-1.5 pl-2 pr-1 flex items-center gap-1 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-100 dark:hover:bg-emerald-800"
                               >
                                 {skill}
-                                <button
-                                  type="button"
-                                  className="ml-1 rounded-full p-0.5 hover:bg-emerald-200 dark:hover:bg-emerald-800"
+                                <span
+                                  role="button"
+                                  tabIndex={0}
+                                  className="ml-1 rounded-full p-0.5 hover:bg-emerald-200 dark:hover:bg-emerald-800 cursor-pointer"
                                   onClick={() => removeSkill(skill)}
+                                  onKeyDown={(e) => e.key === 'Enter' && removeSkill(skill)}
                                 >
                                   <X className="h-3 w-3" />
-                                </button>
+                                </span>
                               </Badge>
                             ))}
                             {skills.length === 0 && (
@@ -466,20 +550,29 @@ export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
                       <Separator />
                       
                       {/* Education & Languages */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <FormField
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">                        <FormField
                           control={form.control}
-                          name="education"
+                          name="educationLevel"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{d.form.education}</FormLabel>
-                              <FormControl>
-                                <Textarea 
-                                  placeholder="Bachelor's Degree in Computer Science, University of Example, 2020"
-                                  {...field}
-                                  className="resize-none h-24"
-                                />
-                              </FormControl>
+                              <FormLabel>{d.form.education} *</FormLabel>
+                              <Select 
+                                onValueChange={field.onChange} 
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select education level" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {educationLevelOptions.map((option) => (
+                                    <SelectItem key={option} value={option}>
+                                      {option}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -561,15 +654,19 @@ export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
                               </FormItem>
                             )}
                           />
-                          
-                          <FormField
+                            <FormField
                             control={form.control}
                             name="salaryExpectations"
                             render={({ field }) => (
                               <FormItem className="md:col-span-2">
                                 <FormLabel>{d.form.salaryExpectations}</FormLabel>
                                 <FormControl>
-                                  <Input {...field} placeholder="e.g., $60,000 - $80,000 per year" />
+                                  <Input 
+                                    type="number"
+                                    {...field} 
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                    placeholder="e.g., 60000" 
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>

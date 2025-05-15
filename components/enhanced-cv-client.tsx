@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Upload, 
@@ -178,8 +178,7 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
   const [skillInput, setSkillInput] = useState("");
   const [languages, setLanguages] = useState<string[]>(["English"]);
   const [languageInput, setLanguageInput] = useState("");
-  const [certifications, setCertifications] = useState<string[]>([]);
-  const [certificationInput, setCertificationInput] = useState("");
+  const [certifications, setCertifications] = useState<string[]>([]);  const [certificationInput, setCertificationInput] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Add safe access to dictionary with fallback
@@ -264,17 +263,41 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
     control: form.control,
     name: "education"
   });
-
   const { fields: projectFields, append: appendProject, remove: removeProject } = useFieldArray({
     control: form.control,
     name: "projects"
   });
+  // Effect to initialize state from form values and watch for changes
+  useEffect(() => {
+    console.log("Form skills at init:", form.getValues()?.skills);
+    
+    // Set initial default skill for the form if it doesn't have any
+    if (!form.getValues()?.skills || form.getValues()?.skills.length === 0) {
+      console.log("Setting initial default skills in the form");
+      form.setValue("skills", []);
+    }
+    
+    // Set the initial skills from form values
+    const initialSkills = form.getValues()?.skills || [];
+    setSkills(initialSkills);
+    console.log("Initial skills state set:", initialSkills);
+    
+    // Watch for changes to skills in the form
+    const subscription = form.watch((value) => {
+      if (value.skills) {
+        console.log("Skills updated in form:", value.skills);
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   const addSkill = () => {
     if (skillInput.trim() !== "" && !skills.includes(skillInput.trim())) {
       const newSkills = [...skills, skillInput.trim()];
       setSkills(newSkills);
       form.setValue("skills", newSkills);
+      console.log("Updated skills:", newSkills);
       setSkillInput("");
     }
   };
@@ -283,6 +306,7 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
     const newSkills = skills.filter(skill => skill !== skillToRemove);
     setSkills(newSkills);
     form.setValue("skills", newSkills);
+    console.log("Updated skills after removal:", newSkills);
   };
 
   const addLanguage = () => {
@@ -313,17 +337,124 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
     const newCertifications = certifications.filter(cert => cert !== certificationToRemove);
     setCertifications(newCertifications);
     form.setValue("certifications", newCertifications);
-  };
-
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    setIsProcessing(true);
+  };  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    console.log("Form submission started");
+    console.log("Form data:", JSON.stringify(data, null, 2));
     
-    // Simulate submitting the form
-    setTimeout(() => {
+    // Validate that we have at least one skill
+    if (!data.skills || data.skills.length === 0) {
+      console.error("Skills validation failed - no skills provided");
+      setError("Please add at least one skill");
+      return;
+    }
+    
+    setIsProcessing(true);
+    setError(null);
+      try {
+      // Prepare applicant data with detailed structure matching the database schema
+      const applicantData = {
+        name: `${data.firstName} ${data.lastName}`.trim(),
+        email: data.email.trim(),
+        phone: data.phone || null,
+        skills: Array.isArray(data.skills) ? data.skills.filter(Boolean) : [], 
+        experience: data.experience || null,
+        // Include work history if available
+        workHistory: Array.isArray(data.workHistory) && data.workHistory.length > 0 
+          ? data.workHistory.map(job => ({
+              company: job.company,
+              position: job.position,
+              startDate: job.startDate,
+              endDate: job.endDate || null,
+              description: job.description || null,
+              isCurrent: !!job.isCurrent
+            }))
+          : undefined,
+        // Include education level and details
+        educationLevel: data.educationLevel || null,
+        education: Array.isArray(data.education) && data.education.length > 0
+          ? data.education.map(edu => ({
+              degree: edu.degree,
+              institution: edu.institution,
+              field: edu.field || null, 
+              graduationYear: edu.graduationYear
+            }))
+          : undefined,
+        languages: Array.isArray(data.languages) ? data.languages.filter(Boolean) : [],
+        // Include additional profile links
+        githubUrl: data.githubUrl || null,
+        portfolioUrl: data.portfolioUrl || null,
+        jobPreferences: {
+          additionalInfo: data.additionalInfo || "",
+          location: data.location || "",
+          portfolioUrl: data.portfolioUrl || "",
+          githubUrl: data.githubUrl || ""
+        },
+        remoteOption: !!data.remoteWork, // ensure boolean
+        relocationOption: !!data.relocation, // ensure boolean
+        salaryExpectations: data.salaryExpectations ? data.salaryExpectations.toString() : null,
+        linkedinUrl: data.linkedinUrl || null
+      };console.log("Sending data to API:", JSON.stringify(applicantData, null, 2));
+      
+      try {
+        console.log("Calling API endpoint: /api/applicants");
+        const response = await fetch('/api/applicants', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(applicantData),
+        });
+        
+        console.log("API Response status:", response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`HTTP error! Status: ${response.status}`, errorText);
+          setIsProcessing(false);
+          setError(`Server error: ${response.status}. Please try again later.`);
+          return;
+        }
+        
+        // Parse response
+        try {
+          const result = await response.json();
+          console.log("API Response data:", JSON.stringify(result, null, 2));
+          
+          if (result.success) {
+            setIsProcessing(false);
+            setIsSuccess(true);
+            console.log("Application submitted successfully:", result.data?.id);
+            
+            // Log to confirm data was saved to database
+            console.log("Database record ID:", result.data?.id);
+            console.log("Database record created:", result.data?.createdAt || result.data?.created_at);
+            
+            // Scroll to top to show success message
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Clear form after successful submission
+            form.reset();
+          } else {
+            setIsProcessing(false);
+            const errorMessage = result.error || dictionary.uploadcv.error.generic;
+            setError(errorMessage);
+            console.error('Error from API:', errorMessage);
+          }
+        } catch (parseError) {
+          console.error("Error parsing API response:", parseError);
+          setIsProcessing(false);
+          setError("Error parsing server response. Please try again.");
+        }
+      } catch (fetchError) {
+        console.error("Fetch error:", fetchError);
+        setIsProcessing(false);
+        setError("Network error, please try again.");
+      }
+    } catch (error) {
+      console.error('Unexpected error during form submission:', error);
       setIsProcessing(false);
-      setIsSuccess(true);
-      console.log(data);
-    }, 2000);
+      setError(dictionary.uploadcv.error.generic);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -619,20 +750,21 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                           </div>
                           
                           <div className="flex flex-wrap gap-2">
-                            {skills.map((skill) => (
-                              <Badge 
+                            {skills.map((skill) => (                              <Badge 
                                 key={skill} 
                                 variant="secondary"
                                 className="py-1.5 pl-3 pr-2 flex items-center gap-1 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-200 dark:hover:bg-emerald-800/60"
                               >
                                 {skill}
-                                <button
-                                  type="button"
-                                  className="ml-1 rounded-full p-0.5 hover:bg-emerald-200 dark:hover:bg-emerald-800"
+                                <span
+                                  role="button"
+                                  tabIndex={0}
+                                  className="ml-1 rounded-full p-0.5 hover:bg-emerald-200 dark:hover:bg-emerald-800 cursor-pointer"
                                   onClick={() => removeSkill(skill)}
+                                  onKeyDown={(e) => e.key === 'Enter' && removeSkill(skill)}
                                 >
                                   <X className="h-3 w-3" />
-                                </button>
+                                </span>
                               </Badge>
                             ))}
                             {skills.length === 0 && (
@@ -678,20 +810,21 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                           </div>
                           
                           <div className="flex flex-wrap gap-2">
-                            {languages.map((language) => (
-                              <Badge 
+                            {languages.map((language) => (                              <Badge 
                                 key={language} 
                                 variant="secondary"
                                 className="py-1.5 pl-3 pr-2 flex items-center gap-1 bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-200 dark:hover:bg-blue-800/60"
                               >
                                 {language}
-                                <button
-                                  type="button"
-                                  className="ml-1 rounded-full p-0.5 hover:bg-blue-200 dark:hover:bg-blue-800"
+                                <span
+                                  role="button"
+                                  tabIndex={0}
+                                  className="ml-1 rounded-full p-0.5 hover:bg-blue-200 dark:hover:bg-blue-800 cursor-pointer"
                                   onClick={() => removeLanguage(language)}
+                                  onKeyDown={(e) => e.key === 'Enter' && removeLanguage(language)}
                                 >
                                   <X className="h-3 w-3" />
-                                </button>
+                                </span>
                               </Badge>
                             ))}
                             {languages.length === 0 && (
@@ -1076,20 +1209,21 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                           </div>
                           
                           <div className="flex flex-wrap gap-2">
-                            {certifications.map((cert) => (
-                              <Badge 
+                            {certifications.map((cert) => (                              <Badge 
                                 key={cert} 
                                 variant="secondary"
                                 className="py-1.5 pl-3 pr-2 flex items-center gap-1 bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-200 dark:hover:bg-amber-800/60"
                               >
                                 {cert}
-                                <button
-                                  type="button"
-                                  className="ml-1 rounded-full p-0.5 hover:bg-amber-200 dark:hover:bg-amber-800"
+                                <span
+                                  role="button"
+                                  tabIndex={0}
+                                  className="ml-1 rounded-full p-0.5 hover:bg-amber-200 dark:hover:bg-amber-800 cursor-pointer"
                                   onClick={() => removeCertification(cert)}
+                                  onKeyDown={(e) => e.key === 'Enter' && removeCertification(cert)}
                                 >
                                   <X className="h-3 w-3" />
-                                </button>
+                                </span>
                               </Badge>
                             ))}
                             {certifications.length === 0 && (
