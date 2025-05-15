@@ -40,7 +40,7 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { AnimatedBackground } from "@/components/animated-background";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import * as z from "zod";
 import { cn } from "@/lib/utils";
 
@@ -105,8 +105,8 @@ const formSchema = z.object({
   experience: z.string(),
   education: z.string().optional(),
   languages: z.array(z.string()).min(1, { message: "Add at least one language." }),
-  remoteWork: z.boolean().default(false),
-  relocation: z.boolean().default(false),
+  remoteWork: z.boolean(),
+  relocation: z.boolean(),
   salaryExpectations: z.string().optional(),
   additionalInfo: z.string().optional(),
 });
@@ -133,8 +133,9 @@ export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const d = dictionary.uploadcv;
+  type FormValues = z.infer<typeof formSchema>;
   
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -264,9 +265,7 @@ export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
     const newSkills = skills.filter(skill => skill !== skillToRemove);
     setSkills(newSkills);
     form.setValue("skills", newSkills);
-  };
-
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  };  const onSubmit: SubmitHandler<FormValues> = (data) => {
     setIsProcessing(true);
     
     // Simulate submitting the form
