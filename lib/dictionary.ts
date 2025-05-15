@@ -81,10 +81,14 @@ const dictionaries: Record<string, any> = {
       noResults: "No matching resources found",
       adjustSearch: "Try adjusting your search or filters",
       clearFilters: "Clear all filters"
-    },
-    uploadcv: {
+    },    uploadcv: {
       title: "Upload Your CV",
       subtitle: "Let our AI analyze your skills and match you with the perfect job opportunities",
+      instructions: {
+        title: "Instructions",
+        english: "Please complete the form below with your professional information.",
+        chinese: "请在下面表格中填写您的专业信息。"
+      },
       dropzone: {
         title: "Drop your CV here",
         subtitle: "or click to browse files",
@@ -114,7 +118,7 @@ const dictionaries: Record<string, any> = {
         remoteOption: "Open to remote work",
         relocationOption: "Open to relocation",
         salaryExpectations: "Salary Expectations",
-        submit: "Find Matching Jobs",
+        submit: "Save Resume",
         privacyNotice: "By submitting, you agree to our Terms and Privacy Policy"
       },
       success: {
@@ -288,10 +292,14 @@ const dictionaries: Record<string, any> = {
       noResults: "未找到匹配的资源",
       adjustSearch: "请调整您的搜索或筛选条件",
       clearFilters: "清除所有筛选"
-    },
-    uploadcv: {
+    },    uploadcv: {
       title: "上传您的简历",
       subtitle: "让我们的AI分析您的技能并匹配最适合您的工作机会",
+      instructions: {
+        title: "使用说明",
+        english: "Please complete the form below with your professional information.",
+        chinese: "请在下面表格中填写您的专业信息。"
+      },
       dropzone: {
         title: "将简历拖放到这里",
         subtitle: "或点击浏览文件",

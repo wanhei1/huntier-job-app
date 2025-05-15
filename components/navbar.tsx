@@ -6,7 +6,6 @@ import { LanguageToggle } from "@/components/language-toggle"
 import { NavClient } from "@/components/nav-client"
 import { getDictionary } from "@/lib/dictionary"
 import styles from '@/styles/navbar-animations.module.css'
-import { ApplicationQRCode } from "@/components/qr-code"
 
 interface NavbarProps {
   lang: string
@@ -17,7 +16,6 @@ export async function Navbar({ lang }: NavbarProps) {
   const navItems = [
     { name: dictionary.navbar.resources, href: `/${lang}/resources` },
     { name: dictionary.navbar.about, href: `/${lang}/about` },
-    { name: dictionary.navbar.uploadCV, href: `/${lang}/uploadcv` },
   ]
 
   return (
@@ -67,10 +65,6 @@ export async function Navbar({ lang }: NavbarProps) {
                   chinese: dictionary.languageToggle.chinese,
                 }}
               />
-            </div>
-            <div className="relative transition-all hover:scale-105">
-              <ApplicationQRCode lang={lang} />
-              <div className="absolute top-0 right-0 w-full h-full bg-transparent rounded-full animate-ping-slow opacity-0 hover:opacity-30 transition-opacity duration-300"></div>
             </div>
           </div>
         </div>

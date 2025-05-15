@@ -79,8 +79,13 @@
     "clearFilters": "清除所有筛选"
   },
   "uploadcv": {
-    "title": "上传您的简历",
-    "subtitle": "让我们的AI分析您的技能并匹配最适合您的工作机会",
+    "title": "Huntier 求职信息表 Job Application Form",
+    "subtitle": "请填写以下表格，通过Huntier申请工作",
+    "instructions": {
+      "title": "求职者须知",
+      "english": "Please provide accurate information about your skills, experience, and preferences to help us find the best job matches for you. All fields marked with * are required.",
+      "chinese": "请提供准确的技能、经验和偏好信息，以帮助我们为您找到最佳工作机会。标有*的字段为必填项。"
+    },
     "dropzone": {
       "title": "将简历拖放到这里",
       "subtitle": "或点击浏览文件",
@@ -110,7 +115,7 @@
       "remoteOption": "接受远程工作",
       "relocationOption": "接受异地工作",
       "salaryExpectations": "期望薪资",
-      "submit": "查找匹配的工作",
+      "submit": "保存简历",
       "privacyNotice": "提交即表示您同意我们的条款和隐私政策"
     },
     "success": {

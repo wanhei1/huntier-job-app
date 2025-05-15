@@ -79,8 +79,13 @@
     "clearFilters": "Clear all filters"
   },
   "uploadcv": {
-    "title": "Upload Your CV",
-    "subtitle": "Let our AI analyze your skills and match you with the perfect job opportunities",
+    "title": "Huntier 求职信息表 Job Application Form",
+    "subtitle": "Please fill out the form below to apply for jobs through Huntier",
+    "instructions": {
+      "title": "Instructions for Job Seekers",
+      "english": "Please provide accurate information about your skills, experience, and preferences to help us find the best job matches for you. All fields marked with * are required.",
+      "chinese": "请提供准确的技能、经验和偏好信息，以帮助我们为您找到最佳工作机会。标有*的字段为必填项。"
+    },
     "dropzone": {
       "title": "Drop your CV here",
       "subtitle": "or click to browse files",
@@ -110,7 +115,7 @@
       "remoteOption": "Open to remote work",
       "relocationOption": "Open to relocation",
       "salaryExpectations": "Salary Expectations",
-      "submit": "Find Matching Jobs",
+      "submit": "Save Resume",
       "privacyNotice": "By submitting, you agree to our Terms and Privacy Policy"
     },
     "success": {

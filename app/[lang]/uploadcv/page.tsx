@@ -1,5 +1,5 @@
 import { getDictionary } from "@/lib/dictionary";
-import { UploadCVClient } from "@/components/upload-cv-client";
+import { EnhancedCVClient } from "@/components/enhanced-cv-client";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,8 +7,15 @@ export const metadata: Metadata = {
   description: "Upload your CV and let our AI match you with the perfect job opportunities.",
 };
 
-export default async function UploadCVPage({ params }: { params: { lang: string } }) {
-  const dictionary = await getDictionary(params.lang);
+export default async function UploadCVPage({ 
+  params 
+}: { 
+  params: { lang: string } 
+}) {
+  // In Next.js 15, we need to await params before accessing its properties
+  const resolvedParams = await params;
+  const lang = resolvedParams.lang;
+  const dictionary = await getDictionary(lang);
   
-  return <UploadCVClient dictionary={dictionary} lang={params.lang} />;
+  return <EnhancedCVClient dictionary={dictionary} lang={lang} />;
 }

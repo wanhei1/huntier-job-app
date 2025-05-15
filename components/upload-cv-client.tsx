@@ -49,6 +49,11 @@ interface UploadCVClientProps {
     uploadcv: {
       title: string;
       subtitle: string;
+      instructions: {
+        title: string;
+        english: string;
+        chinese: string;
+      };
       dropzone: {
         title: string;
         subtitle: string;
@@ -98,17 +103,43 @@ interface UploadCVClientProps {
 }
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  firstName: z.string().min(2, { message: "First name must be at least 2 characters." }),
+  lastName: z.string().min(2, { message: "Last name must be at least 2 characters." }),
+  chineseName: z.string().optional(),
   email: z.string().email({ message: "Please enter a valid email address." }),
   phone: z.string().optional(),
+  location: z.string().optional(),
   skills: z.array(z.string()).min(1, { message: "Add at least one skill." }),
-  experience: z.string(),
-  education: z.string().optional(),
   languages: z.array(z.string()).min(1, { message: "Add at least one language." }),
+  experience: z.string(),
+  workHistory: z.array(z.object({
+    company: z.string(),
+    position: z.string(),
+    startDate: z.string(),
+    endDate: z.string().optional(),
+    description: z.string().optional(),
+    isCurrent: z.boolean().optional()
+  })).optional(),
+  educationLevel: z.string(),
+  education: z.array(z.object({
+    degree: z.string(),
+    institution: z.string(),
+    field: z.string().optional(),
+    graduationYear: z.string(),
+  })).optional(),
+  certifications: z.array(z.string()).optional(),
+  projects: z.array(z.object({
+    name: z.string(),
+    description: z.string().optional(),
+    url: z.string().optional(),
+  })).optional(),
   remoteWork: z.boolean(),
   relocation: z.boolean(),
-  salaryExpectations: z.string().optional(),
+  salaryExpectations: z.number().min(0).max(1000000),
   additionalInfo: z.string().optional(),
+  linkedinUrl: z.string().optional(),
+  githubUrl: z.string().optional(),
+  portfolioUrl: z.string().optional(),
 });
 
 const experienceOptions = [
@@ -120,19 +151,68 @@ const languageOptions = [
   "Japanese", "Korean", "Russian", "Arabic", "Portuguese"
 ];
 
+const educationLevelOptions = [
+  "High School", "Associate's Degree", "Bachelor's Degree", "Master's Degree", 
+  "PhD", "Vocational Training", "Professional Certification", "Other"
+];
+
+const locationOptions = [
+  "Beijing", "Shanghai", "Guangzhou", "Shenzhen", "Hangzhou", 
+  "Chengdu", "Xi'an", "Nanjing", "Wuhan", "Tianjin", "Other"
+];
+
 export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [linkedinUrl, setLinkedinUrl] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showForm, setShowForm] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [skills, setSkills] = useState<string[]>([]);
-  const [skillInput, setSkillInput] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [skillInput, setSkillInput] = useState("");  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const d = dictionary.uploadcv;
+  // Add safe access to dictionary with fallback
+  const d = dictionary?.uploadcv || {
+    title: "Upload Your CV",
+    subtitle: "Let our AI analyze your skills and match you with the perfect job opportunities",
+    instructions: {
+      title: "Instructions",
+      english: "Please complete the form below with your professional information.",
+      chinese: "请在下面表格中填写您的专业信息。"
+    },
+    dropzone: {
+      title: "Drop your CV here",
+      subtitle: "or click to browse files",
+      formats: "Supported formats: PDF, DOCX (max 5MB)",
+      dragActive: "Drop to upload"
+    },
+    or: "OR",
+    form: {
+      name: "Full Name",
+      email: "Email Address",
+      phone: "Phone Number",
+      skills: "Skills",
+      addSkill: "Add Skill",
+      experience: "Years of Experience",
+      education: "Education",
+      languages: "Languages",
+      jobPreferences: "Job Preferences",
+      remoteOption: "Open to remote work",
+      relocationOption: "Open to relocation",
+      salaryExpectations: "Salary Expectations",
+      submit: "Find Matching Jobs",
+      privacyNotice: "By submitting, you agree to our Terms and Privacy Policy"
+    },
+    success: {
+      title: "CV Uploaded Successfully!",
+      subtitle: "We've analyzed your profile and found matching opportunities.",
+      cta: "View Matching Jobs"
+    },
+    error: {
+      generic: "Something went wrong. Please try again.",
+      fileSize: "File is too large. Maximum size is 5MB.",
+      fileType: "Invalid file format. Please upload a PDF or DOCX file.",
+      emptyFields: "Please fill in all required fields."
+    }
+  };
+  
   type FormValues = z.infer<typeof formSchema>;
   
   const form = useForm<FormValues>({
@@ -152,106 +232,6 @@ export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
     },
   });
 
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const file = e.dataTransfer.files[0];
-      validateAndSetFile(file);
-    }
-  };
-
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      validateAndSetFile(file);
-    }
-  };
-
-  const validateAndSetFile = (file: File) => {
-    // Check file type
-    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    const fileType = file.type;
-    
-    if (!allowedTypes.includes(fileType)) {
-      setError(d.error.fileType);
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
-      setError(d.error.fileSize);
-      return;
-    }
-
-    setError(null);
-    setSelectedFile(file);
-    
-    // Simulate processing
-    processFile(file);
-  };
-
-  const processFile = (file: File) => {
-    setIsProcessing(true);
-    
-    // Simulate AI processing the file
-    setTimeout(() => {
-      setIsProcessing(false);
-      setShowForm(true);
-      
-      // Pre-fill form with mock extracted data
-      form.setValue("name", "Alex Johnson");
-      form.setValue("email", "alex.johnson@example.com");
-      form.setValue("skills", ["React", "JavaScript", "TypeScript", "CSS"]);
-      setSkills(["React", "JavaScript", "TypeScript", "CSS"]);
-    }, 3000);
-  };
-
-  const handleLinkedInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLinkedinUrl(e.target.value);
-  };
-
-  const importLinkedIn = () => {
-    if (!linkedinUrl.includes('linkedin.com/')) {
-      setError('Please enter a valid LinkedIn URL');
-      return;
-    }
-    
-    setError(null);
-    setIsProcessing(true);
-    
-    // Simulate processing
-    setTimeout(() => {
-      setIsProcessing(false);
-      setShowForm(true);
-      
-      // Pre-fill form with mock extracted data
-      form.setValue("name", "Alex Johnson");
-      form.setValue("email", "alex.johnson@example.com");
-      form.setValue("skills", ["React", "JavaScript", "TypeScript", "CSS"]);
-      setSkills(["React", "JavaScript", "TypeScript", "CSS"]);
-    }, 3000);
-  };
-
   const addSkill = () => {
     if (skillInput.trim() !== "" && !skills.includes(skillInput.trim())) {
       const newSkills = [...skills, skillInput.trim()];
@@ -265,7 +245,9 @@ export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
     const newSkills = skills.filter(skill => skill !== skillToRemove);
     setSkills(newSkills);
     form.setValue("skills", newSkills);
-  };  const onSubmit: SubmitHandler<FormValues> = (data) => {
+  };
+
+  const onSubmit: SubmitHandler<FormValues> = (data) => {
     setIsProcessing(true);
     
     // Simulate submitting the form
@@ -274,6 +256,29 @@ export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
       setIsSuccess(true);
       console.log(data);
     }, 2000);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      
+      // Check file type
+      const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      const fileType = file.type;
+      
+      if (!allowedTypes.includes(fileType)) {
+        setError(d.error.fileType);
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        setError(d.error.fileSize);
+        return;
+      }
+
+      setError(null);
+      // File is valid but we're not processing it in this simpler form approach
+    }
   };
 
   return (
@@ -293,459 +298,341 @@ export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
       </div>
 
       <div className="container max-w-4xl mx-auto pt-16 px-4 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-400 dark:to-teal-300 inline-block">
-            {d.title}
-          </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            {d.subtitle}
-          </p>
-        </motion.div>
-
         <AnimatePresence mode="wait">
-          {!showForm && !isProcessing && !isSuccess && (
-            <motion.div
-              key="upload-options"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-8"
-            >
-              <Card className="overflow-hidden border-border/40 bg-card/50 backdrop-blur-sm">
-                <div 
-                  className={cn(
-                    "border-2 border-dashed rounded-xl p-10 text-center transition-colors cursor-pointer relative",
-                    isDragging
-                      ? "border-emerald-400 bg-emerald-50/50 dark:border-emerald-500/50 dark:bg-emerald-950/10"
-                      : "border-border bg-background/50 hover:bg-background/80 dark:hover:bg-background/10"
-                  )}
-                  onDragEnter={handleDragEnter}
-                  onDragLeave={handleDragLeave}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    className="hidden"
-                    accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    onChange={handleFileInputChange}
-                  />
-                  
-                  <div className="space-y-4 relative z-10">
-                    <div className="bg-emerald-100 dark:bg-emerald-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Upload className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                    
-                    <h3 className="text-xl font-semibold">
-                      {isDragging ? d.dropzone.dragActive : d.dropzone.title}
-                    </h3>
-                    
-                    <p className="text-muted-foreground">
-                      {d.dropzone.subtitle}
-                    </p>
-                    
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {d.dropzone.formats}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-
-              <div className="flex items-center gap-4">
-                <div className="h-px bg-border flex-1"></div>
-                <span className="text-muted-foreground text-sm font-medium">{d.or}</span>
-                <div className="h-px bg-border flex-1"></div>
-              </div>
-
-              <Card className="border-border/40 bg-card/50 backdrop-blur-sm p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-100 dark:bg-blue-900/30 w-10 h-10 rounded-full flex items-center justify-center shrink-0">
-                      <Linkedin className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <h3 className="text-lg font-semibold">{d.linkedin.title}</h3>
-                  </div>
-                  
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Input 
-                      placeholder={d.linkedin.placeholder}
-                      className="flex-1"
-                      value={linkedinUrl}
-                      onChange={handleLinkedInChange}
-                    />
-                    <Button 
-                      onClick={importLinkedIn}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      {d.linkedin.button}
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-2 text-destructive bg-destructive/10 p-3 rounded-md"
-                >
-                  <AlertCircle className="h-5 w-5" />
-                  <span>{error}</span>
-                </motion.div>
-              )}
-            </motion.div>
-          )}
-
-          {isProcessing && (
-            <motion.div
-              key="processing"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center py-16"
-            >
-              <div className="relative w-24 h-24 mb-8">
-                <motion.div
-                  className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-emerald-900/30"
-                  initial={{ scale: 0.8, opacity: 0.5 }}
-                  animate={{ scale: 1.2, opacity: 0 }}
-                  transition={{ 
-                    repeat: Infinity, 
-                    duration: 2,
-                    ease: "easeInOut" 
-                  }}
-                />
-                <motion.div
-                  className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-emerald-900/30"
-                  initial={{ scale: 0.8, opacity: 0.5 }}
-                  animate={{ scale: 1.2, opacity: 0 }}
-                  transition={{ 
-                    repeat: Infinity, 
-                    duration: 2,
-                    delay: 0.6,
-                    ease: "easeInOut" 
-                  }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Sparkles className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
-                </div>
-              </div>
-              
-              <h3 className="text-xl font-semibold mb-2">{d.processing.title}</h3>
-              <p className="text-muted-foreground text-center max-w-md">
-                {d.processing.subtitle}
-              </p>
-              
-              <div className="mt-8 flex items-center gap-2">
-                <Loader2 className="h-5 w-5 animate-spin text-emerald-600 dark:text-emerald-400" />
-                <span className="text-sm text-muted-foreground">Please wait...</span>
-              </div>
-            </motion.div>
-          )}
-
-          {showForm && !isSuccess && (
+          {!isSuccess && (
             <motion.div
               key="form"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
             >
-              <Card className="border-border/40 bg-card/50 backdrop-blur-sm p-6 sm:p-8">
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{d.form.name}</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{d.form.email}</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="phone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{d.form.phone}</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="experience"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{d.form.experience}</FormLabel>
-                            <Select 
-                              onValueChange={field.onChange} 
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select experience" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {experienceOptions.map((option) => (
-                                  <SelectItem key={option} value={option}>
-                                    {option} {option === "10+" ? "" : "years"}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    
-                    <FormField
-                      control={form.control}
-                      name="skills"
-                      render={() => (
-                        <FormItem>
-                          <FormLabel>{d.form.skills}</FormLabel>
-                          <div className="space-y-3">
-                            <div className="flex gap-2">
-                              <Input
-                                value={skillInput}
-                                onChange={(e) => setSkillInput(e.target.value)}
-                                placeholder="React, JavaScript, etc."
-                                className="flex-1"
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    addSkill();
-                                  }
-                                }}
-                              />
-                              <Button 
-                                type="button" 
-                                onClick={addSkill}
-                                className="bg-emerald-500 hover:bg-emerald-600 text-white"
-                              >
-                                <Plus className="h-4 w-4 mr-1" />
-                                {d.form.addSkill}
-                              </Button>
-                            </div>
-                            
-                            {skills.length > 0 && (
-                              <div className="flex flex-wrap gap-2 pt-2">
-                                {skills.map((skill) => (
-                                  <Badge 
-                                    key={skill} 
-                                    variant="secondary"
-                                    className="flex items-center gap-1 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-800/50"
-                                  >
-                                    {skill}
-                                    <button
-                                      type="button"
-                                      onClick={() => removeSkill(skill)}
-                                      className="rounded-full hover:bg-emerald-300/20 ml-1"
-                                    >
-                                      <X className="h-3 w-3" />
-                                      <span className="sr-only">Remove</span>
-                                    </button>
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
-                            <FormMessage />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="education"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{d.form.education}</FormLabel>
-                          <FormControl>
-                            <Textarea 
-                              {...field} 
-                              placeholder="Bachelor's in Computer Science, University of California, 2018-2022"
-                              className="resize-none"
-                              rows={3}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="languages"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{d.form.languages}</FormLabel>
-                          <Select 
-                            onValueChange={(value) => {
-                              const currentLangs = field.value || [];
-                              if (!currentLangs.includes(value)) {
-                                field.onChange([...currentLangs, value]);
-                              }
-                            }}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Add a language" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {languageOptions.map((language) => (
-                                <SelectItem key={language} value={language}>
-                                  {language}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          
-                          {field.value && field.value.length > 0 && (
-                            <div className="flex flex-wrap gap-2 pt-2">
-                              {field.value.map((language) => (
-                                <Badge 
-                                  key={language} 
-                                  variant="secondary"
-                                  className="flex items-center gap-1"
-                                >
-                                  {language}
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const filtered = field.value.filter(
-                                        (lang) => lang !== language
-                                      );
-                                      field.onChange(filtered);
-                                    }}
-                                    className="rounded-full hover:bg-muted ml-1"
-                                  >
-                                    <X className="h-3 w-3" />
-                                    <span className="sr-only">Remove</span>
-                                  </button>
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div>
-                      <h3 className="font-medium mb-3">{d.form.jobPreferences}</h3>
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-0.5">
-                            <Label htmlFor="remote-work">{d.form.remoteOption}</Label>
-                          </div>
+              <div className="text-center mb-8">
+                <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-400 dark:to-teal-300 inline-block">
+                  {d.title}
+                </h1>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  {d.subtitle}
+                </p>
+              </div>
+
+              {/* Instructions section */}
+              <Card className="mb-8 border-border/40 bg-card/50 backdrop-blur-sm p-6">
+                <h2 className="text-xl font-semibold mb-4">{d.instructions.title}</h2>
+                <div className="space-y-4">
+                  <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-md">
+                    <p className="text-sm">{d.instructions.english}</p>
+                  </div>
+                  <div className="p-4 bg-red-50 dark:bg-red-950/30 rounded-md">
+                    <p className="text-sm">{d.instructions.chinese}</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                  <Card className="border-border/40 bg-card/50 backdrop-blur-sm p-6">
+                    <div className="space-y-6">
+                      {/* Basic Information */}
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">Basic Information</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <FormField
                             control={form.control}
-                            name="remoteWork"
+                            name="name"
                             render={({ field }) => (
-                              <FormItem className="flex items-center space-x-2">
+                              <FormItem>
+                                <FormLabel>{d.form.name} *</FormLabel>
                                 <FormControl>
-                                  <Switch
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                    id="remote-work"
-                                  />
+                                  <Input placeholder="John Doe" {...field} />
                                 </FormControl>
+                                <FormMessage />
                               </FormItem>
                             )}
                           />
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-0.5">
-                            <Label htmlFor="relocation">{d.form.relocationOption}</Label>
-                          </div>
+                          
                           <FormField
                             control={form.control}
-                            name="relocation"
+                            name="email"
                             render={({ field }) => (
-                              <FormItem className="flex items-center space-x-2">
+                              <FormItem>
+                                <FormLabel>{d.form.email} *</FormLabel>
                                 <FormControl>
-                                  <Switch
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                    id="relocation"
-                                  />
+                                  <Input placeholder="john.doe@example.com" {...field} />
                                 </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="phone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{d.form.phone}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="+1234567890" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="experience"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{d.form.experience} *</FormLabel>
+                                <Select 
+                                  onValueChange={field.onChange} 
+                                  defaultValue={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select years of experience" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {experienceOptions.map((option) => (
+                                      <SelectItem key={option} value={option}>
+                                        {option} years
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
                               </FormItem>
                             )}
                           />
                         </div>
                       </div>
-                    </div>
-                    
-                    <FormField
-                      control={form.control}
-                      name="salaryExpectations"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{d.form.salaryExpectations}</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="e.g. $80,000 - $100,000" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div className="pt-4">
-                      <p className="text-xs text-muted-foreground mb-6">
-                        {d.form.privacyNotice}
-                      </p>
                       
-                      <Button 
-                        type="submit" 
-                        className="w-full md:w-auto bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white"
-                        size="lg"
-                      >
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        {d.form.submit}
-                      </Button>
+                      <Separator />
+                      
+                      {/* Skills */}
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">{d.form.skills} *</h3>
+                        <div className="space-y-4">
+                          <div className="flex gap-2">
+                            <Input
+                              placeholder="Add a skill..."
+                              value={skillInput}
+                              onChange={(e) => setSkillInput(e.target.value)}
+                              className="flex-1"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  addSkill();
+                                }
+                              }}
+                            />
+                            <Button 
+                              type="button" 
+                              variant="secondary"
+                              onClick={addSkill}
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              {d.form.addSkill}
+                            </Button>
+                          </div>
+                          
+                          <div className="flex flex-wrap gap-2">
+                            {skills.map((skill) => (
+                              <Badge 
+                                key={skill} 
+                                variant="secondary"
+                                className="py-1.5 pl-2 pr-1 flex items-center gap-1 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-100 dark:hover:bg-emerald-800"
+                              >
+                                {skill}
+                                <button
+                                  type="button"
+                                  className="ml-1 rounded-full p-0.5 hover:bg-emerald-200 dark:hover:bg-emerald-800"
+                                  onClick={() => removeSkill(skill)}
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </Badge>
+                            ))}
+                            {skills.length === 0 && (
+                              <p className="text-sm text-muted-foreground">
+                                No skills added yet. Please add at least one skill.
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      {/* Education & Languages */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                          control={form.control}
+                          name="education"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{d.form.education}</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Bachelor's Degree in Computer Science, University of Example, 2020"
+                                  {...field}
+                                  className="resize-none h-24"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <div>
+                          <FormLabel>{d.form.languages} *</FormLabel>
+                          <div className="space-y-2 mt-2">
+                            {languageOptions.map((language) => (
+                              <div key={language} className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  id={`language-${language}`}
+                                  checked={form.watch("languages").includes(language)}
+                                  onChange={(e) => {
+                                    let currentLangs = form.watch("languages");
+                                    if (e.target.checked) {
+                                      form.setValue("languages", [...currentLangs, language]);
+                                    } else {
+                                      form.setValue(
+                                        "languages",
+                                        currentLangs.filter((lang) => lang !== language)
+                                      );
+                                    }
+                                  }}
+                                  className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                                />
+                                <label htmlFor={`language-${language}`} className="text-sm">
+                                  {language}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      {/* Job Preferences */}
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">{d.form.jobPreferences}</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <FormField
+                            control={form.control}
+                            name="remoteWork"
+                            render={({ field }) => (
+                              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                <div className="space-y-0.5">
+                                  <FormLabel className="text-base">
+                                    {d.form.remoteOption}
+                                  </FormLabel>
+                                </div>
+                                <FormControl>
+                                  <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="relocation"
+                            render={({ field }) => (
+                              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                <div className="space-y-0.5">
+                                  <FormLabel className="text-base">
+                                    {d.form.relocationOption}
+                                  </FormLabel>
+                                </div>
+                                <FormControl>
+                                  <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="salaryExpectations"
+                            render={({ field }) => (
+                              <FormItem className="md:col-span-2">
+                                <FormLabel>{d.form.salaryExpectations}</FormLabel>
+                                <FormControl>
+                                  <Input {...field} placeholder="e.g., $60,000 - $80,000 per year" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      {/* CV Upload (Optional) */}
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">Upload CV (Optional)</h3>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                          onChange={handleFileChange}
+                          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 
+                          file:rounded-md file:border-0 file:text-sm file:font-semibold
+                          file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100
+                          dark:file:bg-emerald-900/30 dark:file:text-emerald-400"
+                        />
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {d.dropzone.formats}
+                        </p>
+                      </div>
                     </div>
-                  </form>
-                </Form>
-              </Card>
+                  </Card>
+
+                  <div className="flex flex-col items-center gap-4">
+                    <Button 
+                      type="submit" 
+                      className="w-full md:w-auto bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600"
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        d.form.submit
+                      )}
+                    </Button>
+                    
+                    <p className="text-xs text-muted-foreground text-center">
+                      {d.form.privacyNotice}
+                    </p>
+                  </div>
+
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center gap-2 text-destructive bg-destructive/10 p-3 rounded-md"
+                    >
+                      <AlertCircle className="h-5 w-5" />
+                      <span>{error}</span>
+                    </motion.div>
+                  )}
+                </form>
+              </Form>
             </motion.div>
           )}
 
@@ -754,25 +641,18 @@ export function UploadCVClient({ dictionary, lang }: UploadCVClientProps) {
               key="success"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-center py-16"
+              className="text-center py-16 space-y-6"
             >
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", duration: 0.5 }}
-                className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full mx-auto mb-6 flex items-center justify-center"
-              >
-                <Check className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
-              </motion.div>
+              <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mx-auto">
+                <Check className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+              </div>
               
-              <h2 className="text-2xl font-bold mb-3">{d.success.title}</h2>
-              <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+              <h2 className="text-2xl font-bold">{d.success.title}</h2>
+              <p className="text-muted-foreground max-w-md mx-auto">
                 {d.success.subtitle}
               </p>
-              
-              <Button 
-                className="bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white"
-                size="lg"
+                <Button 
+                className="mt-8 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600"
               >
                 {d.success.cta}
                 <ChevronRight className="ml-2 h-4 w-4" />
