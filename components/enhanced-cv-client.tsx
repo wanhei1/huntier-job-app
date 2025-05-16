@@ -46,6 +46,16 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { 
   Accordion,
   AccordionContent,
@@ -150,10 +160,12 @@ const formSchema = z.object({
   remoteWork: z.boolean(),
   relocation: z.boolean(),
   salaryExpectations: z.number().min(0).max(1000000),
-  additionalInfo: z.string().optional(),
-  linkedinUrl: z.string().optional(),
+  additionalInfo: z.string().optional(),  linkedinUrl: z.string().optional(),
   githubUrl: z.string().optional(),
   portfolioUrl: z.string().optional(),
+  termsAgreed: z.boolean().refine(val => val === true, {
+    message: "You must agree to the terms and conditions to continue.",
+  }),
 });
 
 const experienceOptions = [
@@ -183,7 +195,9 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
   const [skillInput, setSkillInput] = useState("");
   const [languages, setLanguages] = useState<string[]>(["English"]);
   const [languageInput, setLanguageInput] = useState("");
-  const [certifications, setCertifications] = useState<string[]>([]);  const [certificationInput, setCertificationInput] = useState("");
+  const [certifications, setCertifications] = useState<string[]>([]);
+  const [certificationInput, setCertificationInput] = useState("");
+  const [termsDialogOpen, setTermsDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Add safe access to dictionary with fallback
@@ -250,12 +264,12 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
       certifications: [],
       projects: [{ name: "", description: "" }],
       remoteWork: true,
-      relocation: false,
-      salaryExpectations: 10000,
+      relocation: false,      salaryExpectations: 10000,
       additionalInfo: "",
       linkedinUrl: "",
       githubUrl: "",
       portfolioUrl: "",
+      termsAgreed: false,
     },
   });
 
@@ -950,8 +964,7 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                         </FormItem>
                                       )}
                                     />
-                                    
-                                    <FormField
+                                      <FormField
                                       control={form.control}
                                       name={`workHistory.${index}.isCurrent`}
                                       render={({ field }) => (
@@ -960,8 +973,7 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                                             <FormDescription className="text-xs">
                                               {lang === 'zh' ? '这是您当前的工作吗？' : 'Is this your current job?'}
                                             </FormDescription>
-                                          </div>
-                                          <FormControl>
+                                          </div>                                          <FormControl>
                                             <Switch
                                               checked={field.value}
                                               onCheckedChange={field.onChange}
@@ -1351,10 +1363,106 @@ export function EnhancedCVClient({ dictionary, lang }: EnhancedCVClientProps) {
                           {d.dropzone.formats}
                         </p>
                       </div>
-                    </div>
-                  </Card>
+                    </div>                  </Card>
 
-                  <div className="flex flex-col items-center gap-4">
+                  {/* Terms and Conditions Dialog */}
+                  <Dialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen}>
+                    <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>
+                          {lang === 'zh' ? 'Huntier 求职信息表使用条款' : 'Job Application Form Terms and Conditions'}
+                        </DialogTitle>
+                      </DialogHeader>
+                      
+                      <div className="prose prose-sm dark:prose-invert max-w-none py-4">
+                        <p>
+                          {lang === 'zh' 
+                            ? '欢迎使用 Huntier 求职服务平台。为确保我们能够为您提供精准、优质的职位匹配服务，请您在填写求职信息表前仔细阅读以下条款：' 
+                            : 'Welcome to Huntier\'s job application service platform. To help us provide accurate and high-quality job matching, please read the following terms carefully before filling out the application form.'}
+                        </p>
+                        
+                        <h4>
+                          {lang === 'zh' ? '1. 信息填写要求' : '1. Information Requirements'}
+                        </h4>
+                        <p>
+                          {lang === 'zh'
+                            ? '求职者需使用中文或英文准确、完整地填写所有申请表中的信息，以确保职位推荐的准确性和有效性。'
+                            : 'Job seekers must complete all fields in the application form accurately and completely, using either Chinese or English, to ensure precise and effective job matching.'}
+                        </p>
+                        
+                        <h4>
+                          {lang === 'zh' ? '2. 信息用途说明' : '2. Purpose of Information'}
+                        </h4>
+                        <p>
+                          {lang === 'zh'
+                            ? '您提供的所有信息将被严格保密，仅用于 Huntier 提供的招聘服务，包括但不限于岗位匹配、企业推荐及面试安排等。'
+                            : 'All the information you provide will be strictly confidential and used solely for Huntier\'s recruitment services, including but not limited to job matching, employer recommendations, and interview arrangements.'}
+                        </p>
+                        
+                        <h4>
+                          {lang === 'zh' ? '3. 信息保护与隐私' : '3. Data Protection and Privacy'}
+                        </h4>
+                        <p>
+                          {lang === 'zh'
+                            ? 'Huntier 遵守相关数据保护法律法规，承诺在未经您授权的情况下，不向无关第三方披露您的个人信息。'
+                            : 'Huntier complies with applicable data protection laws and regulations and promises not to disclose your personal information to any unrelated third party without your consent.'}
+                        </p>
+                        
+                        <h4>
+                          {lang === 'zh' ? '4. 服务沟通渠道' : '4. Communication Channel'}
+                        </h4>
+                        <p>
+                          {lang === 'zh'
+                            ? '如您在填写过程中有任何疑问或需要帮助，欢迎随时联系 Huntier 服务团队：'
+                            : 'If you have any questions or need assistance during the application process, please contact the Huntier support team:'}
+                        </p>
+                        <p>
+                          📧 {lang === 'zh' ? '电子邮箱 / Email:' : 'Email:'} general@gohuntier.com
+                        </p>
+                      </div>
+                      
+                      <DialogFooter>
+                        <DialogClose asChild>
+                          <Button type="button">
+                            {lang === 'zh' ? '关闭' : 'Close'}
+                          </Button>
+                        </DialogClose>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+
+                  <div className="flex flex-col items-center gap-4 mt-6">
+                    <FormField
+                      control={form.control}
+                      name="termsAgreed"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>
+                              {lang === 'zh' 
+                                ? '✅ 我已阅读并同意' 
+                                : '✅ I have read and agree to the'} 
+                              <span 
+                                className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer ml-1"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setTermsDialogOpen(true);
+                                }}
+                              >
+                                {lang === 'zh' ? '上述条款' : 'Terms and Conditions'}
+                              </span>
+                            </FormLabel>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
                     <Button 
                       type="submit" 
                       className="w-full md:w-auto bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600"
